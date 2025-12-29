@@ -44,6 +44,19 @@ body {
   scrollbar-width: none;
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent;
+}
+
 .glass-nav {
   @apply bg-white/80 dark:bg-primary-dark/85 backdrop-blur-xl border-b border-black/5 dark:border-white/5;
 }

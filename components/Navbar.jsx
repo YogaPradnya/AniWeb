@@ -2,14 +2,11 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Search, Moon, Sun, Bookmark, History, Menu, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { store } from "@/lib/store";
 
 export default function Navbar() {
-  const [query, setQuery] = useState("");
   const [theme, setTheme] = useState("dark");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     const savedTheme = store.getTheme();
@@ -21,14 +18,6 @@ export default function Navbar() {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     store.setTheme(newTheme);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}`);
-      setIsMenuOpen(false);
-    }
   };
 
   return (
@@ -59,18 +48,13 @@ export default function Navbar() {
 
         {/* Search & Actions */}
         <div className="flex items-center gap-2 flex-grow lg:flex-grow-0 justify-end">
-          <form onSubmit={handleSearch} className="relative hidden md:block max-w-[250px] w-full">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari anime..."
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-2 px-4 pr-10 text-sm focus:outline-none focus:border-accent transition-all"
-            />
-            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Search className="w-4 h-4 text-gray-400" />
-            </button>
-          </form>
+          <Link 
+            href="/search"
+            className="p-3 bg-black/5 dark:bg-white/5 rounded-xl hover:bg-accent hover:text-white transition-all"
+            title="Search Anime"
+          >
+            <Search className="w-5 h-5" />
+          </Link>
 
           <button 
             onClick={toggleTheme}
@@ -92,18 +76,13 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="lg:hidden absolute top-20 left-0 w-full bg-white dark:bg-primary-dark border-b border-black/5 dark:border-white/5 p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
-          <form onSubmit={handleSearch} className="relative w-full">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari anime..."
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-5 text-lg"
-            />
-            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2">
-              <Search className="w-6 h-6" />
-            </button>
-          </form>
+          <Link 
+            onClick={() => setIsMenuOpen(false)} 
+            href="/search" 
+            className="flex items-center justify-center gap-3 w-full p-4 bg-accent-gradient text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:scale-105 transition-all"
+          >
+            <Search className="w-5 h-5" /> Search Anime
+          </Link>
           <div className="grid grid-cols-2 gap-4">
             <Link onClick={() => setIsMenuOpen(false)} href="/" className="flex flex-col items-center p-4 bg-black/5 dark:bg-white/5 rounded-2xl font-bold uppercase tracking-widest text-xs">
               Home

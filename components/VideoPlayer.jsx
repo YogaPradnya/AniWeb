@@ -40,12 +40,17 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      const data = await animeApi.getDownload(animeId, epNum, selectedQuality?.resolution);
+      // Resolution WAJIB sesuai dokumentasi - gunakan resolution dari selectedQuality atau default 1080p
+      const resolution = selectedQuality?.resolution || episode.resolutions?.[0] || '1080p';
+      const data = await animeApi.getDownload(animeId, epNum, resolution);
       if (data.downloadUrl) {
         window.open(data.downloadUrl, '_blank');
+      } else {
+        alert("Link download tidak tersedia");
       }
     } catch (e) {
-      alert("Gagal mengambil link download");
+      console.error('[Download] Error:', e);
+      alert("Gagal mengambil link download: " + (e.message || "Unknown error"));
     } finally {
       setDownloading(false);
     }
