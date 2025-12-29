@@ -38,7 +38,7 @@ export default function SearchSidebar({ genres = [] }) {
 
   return (
     <div className="w-full lg:w-[320px] flex-shrink-0">
-      <div className="bg-card border border-black/5 dark:border-white/5 rounded-3xl p-6 sticky top-24 space-y-8">
+      <div className="bg-card border border-black/5 dark:border-white/5 rounded-2xl sm:rounded-3xl p-4 sm:p-6 sticky top-20 sm:top-24 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

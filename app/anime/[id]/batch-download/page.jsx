@@ -132,33 +132,33 @@ export default function BatchDownloadPage({ params }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
       {/* Header */}
-      <div className="mb-12">
-        <Link href={`/anime/${id}`} className="inline-flex items-center gap-2 text-sm font-black text-accent hover:text-white uppercase tracking-widest mb-6 transition-colors">
-          <ChevronLeft className="w-4 h-4" /> Back to {anime?.title || 'Anime Detail'}
+      <div className="mb-8 sm:mb-12">
+        <Link href={`/anime/${id}`} className="inline-flex items-center gap-2 text-xs sm:text-sm font-black text-accent hover:text-white uppercase tracking-widest mb-4 sm:mb-6 transition-colors">
+          <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Back to </span>{anime?.title || 'Anime Detail'}
         </Link>
         
-        <div className="flex items-start gap-8">
+        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-8">
           {anime?.poster && (
             <img
               src={anime.poster}
               alt={anime.title}
-              className="w-32 h-48 object-cover rounded-2xl shadow-hd"
+              className="w-24 h-36 sm:w-32 sm:h-48 object-cover rounded-xl sm:rounded-2xl shadow-hd mx-auto sm:mx-0"
             />
           )}
-          <div className="flex-grow">
-            <h1 className="text-4xl lg:text-5xl font-black tracking-tighter mb-2 italic">
+          <div className="flex-grow w-full">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter mb-2 italic break-words">
               {anime?.title || 'Batch Download'}
             </h1>
-            <p className="text-lg text-gray-400 font-bold mb-6">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-400 font-bold mb-4 sm:mb-6">
               Total {batchInfo.totalEpisodes} episode dalam {batchInfo.totalPacks} pack
             </p>
             
             {/* Resolution Selector */}
             {batchInfo.resolutions && batchInfo.resolutions.length > 1 && (
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 sm:mb-3 block">
                   Pilih Resolusi
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -166,7 +166,7 @@ export default function BatchDownloadPage({ params }) {
                     <button
                       key={res}
                       onClick={() => handleResolutionChange(res)}
-                      className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest transition-all border ${
+                      className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest transition-all border ${
                         selectedResolution === res
                           ? 'bg-accent-gradient border-transparent text-white shadow-hd'
                           : 'bg-card border-black/10 dark:border-white/10 text-gray-400 hover:border-accent'
@@ -196,41 +196,41 @@ export default function BatchDownloadPage({ params }) {
             >
               <button
                 onClick={() => handlePackExpand(pack)}
-                className="w-full px-8 py-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-all"
               >
-                <div className="text-left">
-                  <p className="text-lg font-black uppercase tracking-widest mb-1">{pack.label}</p>
-                  <p className="text-sm font-bold text-gray-400">
+                <div className="text-left flex-1 min-w-0 pr-4">
+                  <p className="text-sm sm:text-base lg:text-lg font-black uppercase tracking-widest mb-1 truncate">{pack.label}</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-400">
                     {pack.episodeCount} episode • {selectedResolution}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                   {loadingPacks[packKey] && (
-                    <Loader2 className="w-5 h-5 animate-spin text-accent" />
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-accent" />
                   )}
                   {isExpanded && downloads.length > 0 && !loadingPacks[packKey] && (
-                    <span className="text-xs font-black text-accent uppercase tracking-widest">
+                    <span className="hidden sm:inline text-xs font-black text-accent uppercase tracking-widest">
                       {downloads.length} links
                     </span>
                   )}
                   {isExpanded ? (
-                    <ChevronUp className="w-6 h-6 text-accent" />
+                    <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-accent flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="w-6 h-6 text-gray-400" />
+                    <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
                   )}
                 </div>
               </button>
 
               {isExpanded && (
-                <div className="border-t-2 border-black/5 dark:border-white/5 p-8 bg-black/5 dark:bg-white/5">
+                <div className="border-t-2 border-black/5 dark:border-white/5 p-4 sm:p-6 lg:p-8 bg-black/5 dark:bg-white/5">
                   {loadingPacks[packKey] ? (
-                    <div className="flex flex-col items-center justify-center py-16 space-y-4">
-                      <Loader2 className="w-10 h-10 animate-spin text-accent" />
-                      <div className="text-center space-y-2">
-                        <p className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                    <div className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-4">
+                      <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-accent" />
+                      <div className="text-center space-y-2 px-4">
+                        <p className="text-xs sm:text-sm font-black text-gray-400 uppercase tracking-widest">
                           Memuat {pack.episodeCount} link download...
                         </p>
-                        <p className="text-xs font-bold text-gray-500">
+                        <p className="text-[10px] sm:text-xs font-bold text-gray-500">
                           Proses ini mungkin memakan waktu beberapa saat
                         </p>
                         <div className="flex items-center justify-center gap-2 mt-4">
@@ -241,42 +241,42 @@ export default function BatchDownloadPage({ params }) {
                       </div>
                     </div>
                   ) : downloads.length > 0 ? (
-                    <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <div className="space-y-2 sm:space-y-3 max-h-[400px] sm:max-h-[500px] overflow-y-auto custom-scrollbar">
                       {downloads.map((download, idx) => (
                         <a
                           key={idx}
                           href={download.downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-between p-4 bg-card border border-black/5 dark:border-white/5 rounded-2xl hover:border-accent transition-all group"
+                          className="flex items-center justify-between p-3 sm:p-4 bg-card border border-black/5 dark:border-white/5 rounded-xl sm:rounded-2xl hover:border-accent transition-all group"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className="p-2 bg-accent/10 rounded-xl">
-                              <Download className="w-5 h-5 text-accent" />
+                          <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                            <div className="p-1.5 sm:p-2 bg-accent/10 rounded-lg sm:rounded-xl flex-shrink-0">
+                              <Download className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                             </div>
-                            <div>
-                              <p className="text-sm font-black uppercase tracking-widest">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm font-black uppercase tracking-widest truncate">
                                 Episode {download.episodeNumber}
                               </p>
                               {download.fileSize && (
-                                <p className="text-xs font-bold text-gray-400 mt-1">
+                                <p className="text-[10px] sm:text-xs font-bold text-gray-400 mt-1">
                                   {download.fileSize}
                                 </p>
                               )}
                             </div>
                           </div>
-                          <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-accent transition-colors" />
+                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-accent transition-colors flex-shrink-0 ml-2" />
                         </a>
                       ))}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                      <p className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                    <div className="flex flex-col items-center justify-center py-8 sm:py-12 space-y-3">
+                      <p className="text-xs sm:text-sm font-black text-gray-400 uppercase tracking-widest">
                         Tidak ada data download
                       </p>
                       <button
                         onClick={() => handlePackExpand(pack)}
-                        className="text-xs font-bold text-accent hover:text-white uppercase tracking-widest px-4 py-2 rounded-xl border border-accent/30 hover:bg-accent transition-all"
+                        className="text-xs font-bold text-accent hover:text-white uppercase tracking-widest px-4 py-2 rounded-lg sm:rounded-xl border border-accent/30 hover:bg-accent transition-all"
                       >
                         Coba Lagi
                       </button>

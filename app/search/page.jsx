@@ -47,15 +47,15 @@ export default async function SearchPage({ searchParams }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header Section */}
-      <div className="mb-12">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 bg-accent/10 rounded-2xl">
-            <Search className="w-6 h-6 text-accent" />
+      <div className="mb-8 sm:mb-12">
+        <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+          <div className="p-2 sm:p-3 bg-accent/10 rounded-xl sm:rounded-2xl">
+            <Search className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
           </div>
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter italic mb-2">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter italic mb-1 sm:mb-2 break-words">
               {q ? (
                 <>Search: <span className="text-accent">"{q}"</span></>
               ) : (
@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }) {
               )}
             </h1>
             {total > 0 && (
-              <p className="text-sm font-bold text-gray-400">
+              <p className="text-xs sm:text-sm font-bold text-gray-400">
                 Menemukan <span className="text-accent">{total}</span> hasil
               </p>
             )}
@@ -75,15 +75,15 @@ export default async function SearchPage({ searchParams }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
         {/* Sidebar Filter */}
         <SearchSidebar genres={genres} />
 
         {/* Results */}
-        <div className="flex-grow">
+        <div className="flex-grow min-w-0">
           {results.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
                 {results.map((anime, idx) => (
                   <AnimeCard key={anime.animeId || anime.id || idx} anime={anime} />
                 ))}
