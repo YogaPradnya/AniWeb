@@ -85,20 +85,24 @@ export default async function WatchPage({ params }) {
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {anime.episodes?.map((e, i) => (
-            <Link key={i} href={`/watch/${id}/${e.number}`} className="group">
-              <div className={`relative aspect-video rounded-[1.5rem] overflow-hidden border-2 transition-all duration-500 ${e.number == ep ? 'border-accent shadow-hd' : 'border-transparent group-hover:border-accent/50'}`}>
-                <img src={e.thumbnail || anime.cover || anime.thumbnail} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Play className="w-8 h-8 text-white fill-white" />
+          {anime.episodes?.map((e, i) => {
+            // Handle both 'episodeNumber' and 'number' field names
+            const epNum = e.episodeNumber || e.number || (i + 1);
+            return (
+              <Link key={i} href={`/watch/${id}/${epNum}`} className="group">
+                <div className={`relative aspect-video rounded-[1.5rem] overflow-hidden border-2 transition-all duration-500 ${epNum == ep ? 'border-accent shadow-hd' : 'border-transparent group-hover:border-accent/50'}`}>
+                  <img src={e.thumbnail || anime.cover || anime.thumbnail} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Play className="w-8 h-8 text-white fill-white" />
+                  </div>
+                  <div className="absolute bottom-3 left-4">
+                    <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Episode {epNum}</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-3 left-4">
-                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Episode {e.number}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>

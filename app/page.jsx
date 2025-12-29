@@ -3,20 +3,61 @@ import AnimeCard from "@/components/AnimeCard";
 import { ChevronRight, TrendingUp, Sparkles, CalendarDays } from "lucide-react";
 import Link from "next/link";
 
+// Disable caching untuk memastikan data selalu fresh
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 async function getHomeData() {
   try {
-    const [scheduleData, trendingData, newAnimeData] = await Promise.all([
-      animeApi.getSchedule("random").catch(() => ({ schedule: [] })),
-      animeApi.getTrending().catch(() => []),
-      animeApi.getNew().catch(() => []),
+    // Ambil hari realtime untuk "Anime Hari Ini"
+    const getCurrentDayRealtime = () => {
+      const now = new Date();
+      const dayIndex = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+      const dayMap = { 0: 'minggu', 1: 'senin', 2: 'selasa', 3: 'rabu', 4: 'kamis', 5: 'jumat', 6: 'sabtu' };
+      return dayMap[dayIndex] || 'senin';
+    };
+
+    const currentDay = getCurrentDayRealtime();
+    console.log(`[Home] Current realtime day: ${currentDay}`);
+
+    const [scheduleData, todayData, trendingData, newAnimeData] = await Promise.all([
+      // PASTIKAN selalu kirim parameter day ke API untuk mendapatkan data sesuai hari
+      animeApi.getSchedule(currentDay).catch((e) => {
+        console.error(`[Home] Error fetching schedule for ${currentDay}:`, e.message);
+        return { schedule: [] };
+      }),
+      // Fallback ke endpoint /today
+      animeApi.getToday().catch((e) => {
+        console.error('[Home] Error fetching today endpoint:', e.message);
+        return { data: [] };
+      }),
+      animeApi.getTrending().catch((e) => {
+        console.error('[Home] Error fetching trending:', e.message);
+        return [];
+      }),
+      animeApi.getNew().catch((e) => {
+        console.error('[Home] Error fetching new:', e.message);
+        return [];
+      }),
     ]);
     
+    console.log(`[Home] Schedule data for ${currentDay}:`, scheduleData?.schedule?.length || 0, 'items');
+    console.log(`[Home] Today endpoint data:`, Array.isArray(todayData) ? todayData.length : (todayData?.data?.length || 0), 'items');
+    
+    // Handle response format sesuai dokumentasi: { success: true, data: [...] }
     const trendingList = Array.isArray(trendingData) ? trendingData : (trendingData?.data || []);
     const newAnimeList = Array.isArray(newAnimeData) ? newAnimeData : (newAnimeData?.data || []);
-    const todayList = scheduleData?.schedule || [];
+    
+    // Prioritas: schedule.schedule > today.data (sesuai dokumentasi, /today return { data: [...] })
+    const todayList = (scheduleData?.schedule && scheduleData.schedule.length > 0) 
+      ? scheduleData.schedule 
+      : (Array.isArray(todayData) ? todayData : (todayData?.data || todayData?.anime || []));
+    
+    console.log(`[Home] Final today list count:`, todayList.length);
     
     return { today: todayList, trending: trendingList, newAnime: newAnimeList };
   } catch (error) {
+    console.error('[Home] Fatal error fetching data:', error);
     return { today: [], trending: [], newAnime: [] };
   }
 }
@@ -60,6 +101,13 @@ export default async function Home() {
   return (
     <div className="space-y-4">
       <HorizontalSection 
+        title="Anime Hari Ini" 
+        data={today} 
+        icon={CalendarDays} 
+        colorClass="bg-purple-500" 
+      />
+      
+      <HorizontalSection 
         title="Sedang Hangat" 
         data={trending} 
         icon={TrendingUp} 
@@ -71,13 +119,6 @@ export default async function Home() {
         data={newAnime} 
         icon={Sparkles} 
         colorClass="bg-blue-500" 
-      />
-      
-      <HorizontalSection 
-        title="Anime Hari Ini" 
-        data={today} 
-        icon={CalendarDays} 
-        colorClass="bg-purple-500" 
       />
     </div>
   );

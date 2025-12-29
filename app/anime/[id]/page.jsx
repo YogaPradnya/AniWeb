@@ -143,16 +143,20 @@ export default function DetailPage({ params }) {
               Daftar Episode ({anime.episodes?.length || 0})
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-              {anime.episodes?.map((ep, idx) => (
-                <Link
-                  key={idx}
-                  href={`/watch/${id}/${ep.number}`}
-                  className="group relative bg-card hover:bg-accent-gradient p-6 rounded-[1.5rem] border border-black/5 dark:border-white/5 transition-all duration-500 text-center shadow-hd-light overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-accent-gradient opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <p className="relative z-10 text-sm font-black uppercase tracking-widest group-hover:text-white group-hover:scale-110 transition-transform">EPS {ep.number}</p>
-                </Link>
-              ))}
+              {anime.episodes?.map((ep, idx) => {
+                // Handle both 'episodeNumber' and 'number' field names
+                const epNum = ep.episodeNumber || ep.number || (idx + 1);
+                return (
+                  <Link
+                    key={idx}
+                    href={`/watch/${id}/${epNum}`}
+                    className="group relative bg-card hover:bg-accent-gradient p-6 rounded-[1.5rem] border border-black/5 dark:border-white/5 transition-all duration-500 text-center shadow-hd-light overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-accent-gradient opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <p className="relative z-10 text-sm font-black uppercase tracking-widest group-hover:text-white group-hover:scale-110 transition-transform">EPS {epNum}</p>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

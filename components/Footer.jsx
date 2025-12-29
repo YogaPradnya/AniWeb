@@ -57,7 +57,7 @@ export default function Footer() {
             &copy; 2025 AnimeOut. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-xs text-gray-500 font-bold uppercase tracking-widest">
-            Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by <span className="text-accent">Archarakun</span>
+            Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by <span className="text-accent">Anonimuus</span>
           </div>
         </div>
       </div>

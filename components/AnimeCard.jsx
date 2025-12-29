@@ -13,6 +13,7 @@ export default function AnimeCard({ anime, isEpisode = false }) {
 
   if (!anime) return null;
   
+  // Handle both 'animeId' and 'id' field names (sesuai dokumentasi API)
   const id = anime.animeId || anime.id;
   const imageUrl = anime.poster || anime.cover || anime.thumbnail;
   const title = anime.title || 'Untitled';
@@ -71,14 +72,37 @@ export default function AnimeCard({ anime, isEpisode = false }) {
 
       {/* Meta Info Below Card (Matching Screenshot) */}
       <div className="px-1 flex flex-col gap-2">
+        {/* Release Time Badge */}
+        {anime.releaseTime && (
+          <div className="mb-1">
+            <span className={`inline-block px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+              anime.releaseTime.toLowerCase().includes('new') 
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                : anime.releaseTime.toLowerCase().includes('tamat')
+                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+            }`}>
+              {anime.releaseTime}
+            </span>
+          </div>
+        )}
+        
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500 dark:text-gray-400">
               <Eye className="w-3 h-3" /> {anime.views || '0'} <span className="ml-0.5">views</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500 dark:text-gray-400">
-              <Heart className={`w-3 h-3 ${isBookmarked ? 'fill-red-500 text-red-500' : ''}`} /> {anime.favorites || '0'} <span className="ml-0.5">favorites</span>
+              <Heart className={`w-3 h-3 ${isBookmarked ? 'fill-red-500 text-red-500' : ''}`} /> 
+              {anime.favorite || anime.favorites || '0'} <span className="ml-0.5">favorites</span>
             </div>
+            {anime.status && (
+              <div className="px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  {anime.status}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
