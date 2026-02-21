@@ -14,10 +14,18 @@ export async function GET(request) {
 
   try {
     const data = await searchAnime(keyword);
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ 
+      success: true, 
+      data,
+      total: data.length
+    });
   } catch (error) {
     console.error('[API] Search error:', error);
     // Return empty array instead of 500 to prevent frontend crash
-    return NextResponse.json({ success: true, data: [] });
+    return NextResponse.json({ 
+      success: true, 
+      data: [],
+      total: 0
+    });
   }
 }
