@@ -1,7 +1,8 @@
 import { animeApi } from "@/lib/api";
 import Link from "next/link";
 import { Play, Star, Search, Bell } from "lucide-react";
-import HeroSlider, { capitalizeWords } from "@/components/HeroSlider";
+import HeroSlider from "@/components/HeroSlider";
+import { capitalizeWords } from "@/lib/utils";
 
 export const revalidate = 600; // 10 menit cache
 

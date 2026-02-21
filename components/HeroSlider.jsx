@@ -3,11 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Star, Play, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Helper function to capitalize first letter of each word
-export function capitalizeWords(str) {
-  if (!str) return "";
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
-}
+import { capitalizeWords } from "@/lib/utils";
 
 export default function HeroSlider({ trending }) {
   const [currentIndex, setCurrentIndex] = useState(0);

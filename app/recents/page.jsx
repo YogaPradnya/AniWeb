@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { store } from "@/lib/store";
-import { capitalizeWords } from "@/components/HeroSlider";
+import { capitalizeWords } from "@/lib/utils";
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { capitalizeWords } from "@/components/HeroSlider";
+import { capitalizeWords } from "@/lib/utils";
 
 export default function GridPage({ title, items = [], errorMsg = "No items found." }) {
   return (
