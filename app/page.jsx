@@ -58,9 +58,8 @@ export default async function Home() {
   const popList = trending || [];
   const popular = popList.slice(0, 5); // Top 5 trending for Right Sidebar
   
-  const sedangHangat = latest?.slice(0, 8) || []; 
-  const baruDitambahkan = newAnime?.slice(0, 8) || [];
-  const hariIni = todayAnime?.slice(0, 8) || [];
+  const jadwalRilis = todayAnime?.slice(0, 12) || [];
+  const ongoing = latest?.slice(0, 12) || [];
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 h-full">
@@ -72,9 +71,8 @@ export default async function Home() {
 
         {/* GRIDS SECTIONS */}
         <div className="space-y-12 pb-10">
-          <SectionGrid title="Sedang Hangat (Ongoing)" items={sedangHangat} badgeColor="bg-[#9933FF]" />
-          <SectionGrid title="Baru Ditambahkan" items={baruDitambahkan} badgeColor="bg-blue-600" />
-          <SectionGrid title="Anime Hari Ini" items={hariIni} badgeColor="bg-green-500" />
+          <SectionGrid title="Jadwal Rilis" items={jadwalRilis} badgeColor="bg-green-500" />
+          <SectionGrid title="Ongoing" items={ongoing} badgeColor="bg-[#9933FF]" />
         </div>
 
       </div>
