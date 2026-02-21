@@ -2,6 +2,7 @@ import { animeApi } from "@/lib/api";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Play, Server, ListVideo } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
+import { capitalizeWords } from "@/lib/utils";
 
 export default async function WatchPage({ params }) {
   const { id, ep } = params;
@@ -64,7 +65,7 @@ export default async function WatchPage({ params }) {
                 </Link>
               )}
               <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                {episodeData.title || `Episode ${ep}`}
+                {capitalizeWords(episodeData.title || `Episode ${ep}`)}
               </h1>
             </div>
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Eye, Heart, Star, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { store } from "@/lib/store";
+import { capitalizeWords } from "@/lib/utils";
 
 export default function AnimeCard({ anime, isEpisode = false }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -63,7 +64,7 @@ export default function AnimeCard({ anime, isEpisode = false }) {
                 {anime.genre || anime.type || 'Action'}
               </span>
               <h3 className="text-sm font-black text-white leading-tight line-clamp-2 transition-colors">
-                {title}
+                {capitalizeWords(title)}
               </h3>
             </div>
           </div>

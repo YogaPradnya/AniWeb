@@ -42,8 +42,9 @@ export default async function SearchPage({ searchParams }) {
         totalResults: total
       };
     }
+    console.log('[Search Page] results found:', results.length);
   } catch (e) {
-    console.error('[Search] Error:', e);
+    console.error('[Search Page] Error:', e);
   }
 
   return (
