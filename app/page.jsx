@@ -48,27 +48,30 @@ const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
 
 export const revalidate = 600; // 10 menit cache
 
+import { getHomeUpstream } from "@/lib/anime-helper";
+
 export default async function Home() {
-  const [trending, latest, newAnime, todayAnime] = await Promise.all([
-    animeApi.getTrending(),
-    animeApi.getLatest(),
-    animeApi.getNew(),
-    animeApi.getToday(),
+  // Fetch data dari upstream (Direct) dan legacy API (Fallback)
+  const [homeUpstream, trending, latest] = await Promise.all([
+    getHomeUpstream().catch(() => null),
+    animeApi.getTrending().catch(() => []),
+    animeApi.getLatest().catch(() => []),
   ]);
 
-  const popList = trending || [];
-  const popular = popList.slice(0, 5); // Top 5 trending for Right Sidebar
+  // Priority data mapping
+  const slides = homeUpstream?.slider || trending?.slice(0, 10) || [];
+  const popularSidebar = homeUpstream?.hot?.slice(0, 5) || trending?.slice(0, 5) || [];
+  const ongoing = homeUpstream?.new || latest || [];
   
-  const jadwalRilis = todayAnime?.slice(0, 12) || [];
-  const ongoing = latest?.slice(0, 12) || [];
-
   return (
     <div className="flex flex-col lg:flex-row gap-8 h-full">
       {/* ─── CENTER CONTENT (Hero & Sections) ─── */}
       <div className="flex-1 overflow-y-auto scrollbar-hide space-y-12">
         
         {/* HERO CAROUSEL */}
-        <HeroSlider trending={popList} />
+        <HeroSlider trending={slides} />
+[diff_block_end]
+
 
         {/* GRIDS SECTIONS */}
         <div className="space-y-12 pb-10">
@@ -95,7 +98,7 @@ export default async function Home() {
         <div className="flex-1 flex flex-col">
           <h2 className="text-lg font-black text-white mb-6">Popular This Week</h2>
           <div className="flex flex-col gap-5 flex-1">
-            {popular.map((item, i) => (
+            {popularSidebar.map((item, i) => (
               <Link 
                 key={i} 
                 href={`/anime/${item.id || item.slug || item.animeId}`}
