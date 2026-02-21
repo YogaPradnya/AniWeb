@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { Play, Eye, Star } from "lucide-react";
 import { capitalizeWords } from "@/lib/utils";
 
 export default function GridPage({ title, items = [], errorMsg = "No items found." }) {
@@ -31,10 +31,26 @@ export default function GridPage({ title, items = [], errorMsg = "No items found
                   </div>
                 </div>
               </div>
-              <div className="px-1">
+              <div className="px-1 mt-1">
                 <h3 className="text-[13px] font-bold text-white line-clamp-2 leading-snug" title={anime.title}>
                   {capitalizeWords(anime.title)}
                 </h3>
+                
+                {(anime.views || anime.rating || anime.score) && (
+                  <div className="flex items-center gap-3 mt-2 text-[10px] font-bold text-gray-400 capitalize tracking-wide">
+                    {/* Fallback mock rating jika tidak ada dr API untuk estetika streamnime */}
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-orange-400 fill-orange-400" />
+                      {anime.rating || anime.score || '4.8'}
+                    </span>
+                    {anime.views && (
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {Number(anime.views).toLocaleString('id-ID')}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </Link>
           ))}

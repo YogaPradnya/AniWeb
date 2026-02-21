@@ -19,7 +19,21 @@ Sebaiknya mendukung parameter query `type`.
 - **GET** `/api/v1/search?type=movie`
 - **GET** `/api/v1/search?type=live-action`
 
-## 3. Implementasi Sementara
+## 3. Bug pada Jadwal (Schedule) Hari Sabtu
+
+Saat parameter `day=sabtu` dikirimkan ke `/api/v1/schedule?day=sabtu`, API merespons dengan `currentDay: "SAB"` namun array `schedule` selalu **kosong** (`[]`).
+
+Indikasi masalah pada _upstream (Backend Scraper)_:
+
+- Mungkin struktur HTML untuk hari Sabtu (`#SABTU` atau `.SAB`) di tabel animeinweb.com berbeda dari hari lain.
+- Terdapat _typo_ pada selector atau nama elemen target di file route Next.js API scraper backend Anda khusus untuk hari "Sabtu".
+
+**Solusi untuk Developer Backend API:**
+Silakan periksa kembali bagian di mana Anda melakukan Cheerio `$('...').each()` untuk DOM jadwal hari Sabtu pada core script scraper Anda.
+
+---
+
+## 4. Implementasi Sementara
 
 Sementara ini, halaman-halaman tersebut telah dibuat di Frontend (`app/ongoing`, `app/completed`, `app/tv`, dsb).
 Untuk mencegah halaman me-return 404 (Not Found), halaman tersebut sementara menggunakan metode:
