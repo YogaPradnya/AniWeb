@@ -1,9 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Hls from "hls.js";
 import { Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import { store } from "@/lib/store";
 
 export default function VideoPlayer({ episode, anime, animeId, epNum }) {
+  const videoRef = useRef(null);
+  const hlsRef = useRef(null);
   const [selectedQuality, setSelectedQuality] = useState(episode.videoSources?.[0]);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -25,6 +28,55 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
       );
     }
   }, [episode, animeId, anime, epNum]);
+
+  // Handle Video Loading with HLS support
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !selectedQuality?.url) return;
+
+    // Ensure URL is properly formatted for browser (handle literal spaces etc.)
+    let streamUrl = selectedQuality.url;
+    if (streamUrl.includes(" ")) {
+      streamUrl = streamUrl.replace(/ /g, "%20");
+    }
+    
+    // Log for debugging (remove in production)
+    console.log("[VideoPlayer] Loading source:", streamUrl);
+
+    // Clean up previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    if (streamUrl.includes(".m3u8")) {
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          startLevel: -1,
+          capLevelToPlayerSize: true,
+          // Add some retry logic for unstable streams
+          enableWorker: true,
+          lowLatencyMode: true,
+        });
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        hlsRef.current = hls;
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        // Native support (Safari)
+        video.src = streamUrl;
+      }
+    } else {
+      // Direct MP4 or other formats
+      video.src = streamUrl;
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [selectedQuality]);
 
   const handleBookmark = () => {
     const status = store.toggleBookmark({
@@ -57,10 +109,11 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
       <div className="bg-black aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 relative">
         {selectedQuality ? (
           <video
-            key={selectedQuality.url}
-            src={decodeURIComponent(selectedQuality.url)}
+            ref={videoRef}
             controls
             autoPlay
+            playsInline
+            crossOrigin="anonymous"
             className="w-full h-full"
           />
         ) : (
@@ -108,7 +161,7 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
                 key={i}
                 onClick={() => setSelectedQuality(v)}
                 className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border ${
-                  selectedQuality?.resolution === v.resolution
+                  selectedQuality === v
                     ? "bg-accent border-transparent text-white shadow-hd"
                     : "bg-transparent border-black/10 dark:border-white/10 text-gray-500 hover:border-accent"
                 }`}
