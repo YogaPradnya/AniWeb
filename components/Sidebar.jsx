@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { 
   Home, TrendingUp, Clock, List, Heart, 
   PlayCircle, CheckCircle, Tv, Film, MonitorPlay, 
-  Settings, LogOut 
+  Settings, LogOut, Calendar
 } from "lucide-react";
 
 export default function Sidebar({ className = "" }) {
@@ -13,6 +13,7 @@ export default function Sidebar({ className = "" }) {
   const menuItems = [
     { label: "Home", href: "/", icon: Home },
     { label: "Trending", href: "/trending", icon: TrendingUp },
+    { label: "Schedule", href: "/schedule", icon: Calendar },
   ];
 
   const generalItems = [
