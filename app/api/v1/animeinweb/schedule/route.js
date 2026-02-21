@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSchedule } from '@/lib/anime-helper';
 
+// Alias dari /api/v1/schedule
 export const revalidate = 3600; // Cache 1 jam sesuai docs
 
 export async function GET(request) {
@@ -11,7 +12,7 @@ export async function GET(request) {
     const data = await getSchedule(day);
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('[API] Schedule error:', error);
+    console.error('[API] AnimeInWeb/Schedule error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

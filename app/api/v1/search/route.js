@@ -1,31 +1,20 @@
-
 import { NextResponse } from 'next/server';
 import { searchAnime } from '@/lib/anime-helper';
 
-export const revalidate = 0; // Disable cache
+export const revalidate = 300; // Cache 5 menit sesuai docs
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const keyword = searchParams.get('q') || searchParams.get('keyword');
-
-  if (!keyword) {
-    return NextResponse.json({ success: false, error: 'Meta keywords missing' }, { status: 400 });
-  }
+  const q = searchParams.get('q') || '';
+  const genre = searchParams.get('genre') || '';
+  const sort = searchParams.get('sort') || 'views';
+  const page = parseInt(searchParams.get('page') || '0');
 
   try {
-    const data = await searchAnime(keyword);
-    return NextResponse.json({ 
-      success: true, 
-      data,
-      total: data.length
-    });
+    const result = await searchAnime(q, { genre, sort, page });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('[API] Search error:', error);
-    // Return empty array instead of 500 to prevent frontend crash
-    return NextResponse.json({ 
-      success: true, 
-      data: [],
-      total: 0
-    });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

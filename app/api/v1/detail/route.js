@@ -1,22 +1,23 @@
-
 import { NextResponse } from 'next/server';
 import { getAnimeDetail } from '@/lib/anime-helper';
 
-export const revalidate = 3600; // Cache 1 hour
+export const revalidate = 1800; // Cache 30 menit sesuai docs
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get('slug') || searchParams.get('id');
+  const url = searchParams.get('url');
 
-  if (!slug) {
-    return NextResponse.json({ success: false, error: 'Slug/ID missing' }, { status: 400 });
+  if (!slug && !url) {
+    return NextResponse.json({ success: false, error: 'Parameter slug atau url diperlukan' }, { status: 400 });
   }
 
   try {
-    const result = await getAnimeDetail(slug);
-    return NextResponse.json(result);
+    const identifier = slug || url;
+    const data = await getAnimeDetail(identifier);
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('[API] Detail error:', error);
-    return NextResponse.json({ success: false, error: 'Detail not found' }, { status: 404 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@
 import { animeApi } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { Play, Star, Calendar, User, Tv, Bookmark, BookmarkCheck, Share2, ChevronDown, Download, Search } from "lucide-react";
+import { Play, Star, Calendar, User, Tv, Bookmark, BookmarkCheck, Share2, ChevronDown, Search } from "lucide-react";
 import { store } from "@/lib/store";
 import ReadMore from "@/components/ReadMore";
 
@@ -127,14 +127,7 @@ export default function DetailPage({ params }) {
                   <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-white" /> <span className="hidden sm:inline">NONTON </span>SEKARANG
                 </Link>
               )}
-              {totalEpisodes > 25 && (
-                <Link 
-                  href={`/anime/${id}/batch-download`}
-                  className="w-full py-3 sm:py-4 bg-card border-2 border-accent/30 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 sm:gap-3 font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-accent hover:text-white transition-all"
-                >
-                  <Download className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden sm:inline">BATCH </span>DOWNLOAD
-                </Link>
-              )}
+
               <div className="flex gap-3 sm:gap-4">
                 <button 
                   onClick={handleBookmark}

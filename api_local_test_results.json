@@ -1,0 +1,155 @@
+[
+  {
+    "label": "Latest Episodes",
+    "url": "http://localhost:3000/api/v1/latest",
+    "status": 200,
+    "success": true,
+    "items": 25,
+    "ms": 1946,
+    "error": null
+  },
+  {
+    "label": "Trending",
+    "url": "http://localhost:3000/api/v1/trending",
+    "status": 200,
+    "success": true,
+    "items": 30,
+    "ms": 4,
+    "error": null
+  },
+  {
+    "label": "New Anime",
+    "url": "http://localhost:3000/api/v1/new",
+    "status": 200,
+    "success": true,
+    "items": 25,
+    "ms": 470,
+    "error": null
+  },
+  {
+    "label": "Today",
+    "url": "http://localhost:3000/api/v1/today",
+    "status": 200,
+    "success": true,
+    "items": 25,
+    "ms": 772,
+    "error": null
+  },
+  {
+    "label": "Genres",
+    "url": "http://localhost:3000/api/v1/genres",
+    "status": 200,
+    "success": true,
+    "items": 33,
+    "ms": 830,
+    "error": null
+  },
+  {
+    "label": "Schedule senin",
+    "url": "http://localhost:3000/api/v1/schedule?day=senin",
+    "status": 200,
+    "success": true,
+    "items": 7,
+    "ms": 404,
+    "error": null
+  },
+  {
+    "label": "Search naruto",
+    "url": "http://localhost:3000/api/v1/search?q=naruto",
+    "status": 200,
+    "success": true,
+    "items": 17,
+    "ms": 466,
+    "error": null
+  },
+  {
+    "label": "Search genre action",
+    "url": "http://localhost:3000/api/v1/search?genre=14&sort=views",
+    "status": 200,
+    "success": true,
+    "items": 60,
+    "ms": 755,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb Info",
+    "url": "http://localhost:3000/api/v1/animeinweb?id=426",
+    "status": 200,
+    "success": true,
+    "items": 1,
+    "ms": 10247,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb Episode",
+    "url": "http://localhost:3000/api/v1/animeinweb/episode?animeId=426&episodeNumber=1",
+    "status": 200,
+    "success": true,
+    "items": 1,
+    "ms": 17035,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb/Schedule alias",
+    "url": "http://localhost:3000/api/v1/animeinweb/schedule?day=senin",
+    "status": 200,
+    "success": true,
+    "items": 7,
+    "ms": 420,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb/Trending alias",
+    "url": "http://localhost:3000/api/v1/animeinweb/trending",
+    "status": 200,
+    "success": true,
+    "items": 30,
+    "ms": 897,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb/New alias",
+    "url": "http://localhost:3000/api/v1/animeinweb/new",
+    "status": 200,
+    "success": true,
+    "items": 25,
+    "ms": 445,
+    "error": null
+  },
+  {
+    "label": "AnimeInWeb/Today alias",
+    "url": "http://localhost:3000/api/v1/animeinweb/today",
+    "status": 200,
+    "success": true,
+    "items": 25,
+    "ms": 445,
+    "error": null
+  },
+  {
+    "label": "Detail by slug",
+    "url": "http://localhost:3000/api/v1/detail?slug=one-piece",
+    "status": 200,
+    "success": true,
+    "items": 1,
+    "ms": 8555,
+    "error": null
+  },
+  {
+    "label": "Detail by ID",
+    "url": "http://localhost:3000/api/v1/detail?slug=426",
+    "status": 200,
+    "success": true,
+    "items": 1,
+    "ms": 7769,
+    "error": null
+  },
+  {
+    "label": "List page 1",
+    "url": "http://localhost:3000/api/v1/list?page=1",
+    "status": 200,
+    "success": true,
+    "items": 60,
+    "ms": 750,
+    "error": null
+  }
+]

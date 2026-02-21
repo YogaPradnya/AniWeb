@@ -1,27 +1,28 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Download, Bookmark, BookmarkCheck, Share2 } from "lucide-react";
-import { animeApi } from "@/lib/api";
+import { Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import { store } from "@/lib/store";
 
 export default function VideoPlayer({ episode, anime, animeId, epNum }) {
   const [selectedQuality, setSelectedQuality] = useState(episode.videoSources?.[0]);
-  const [downloading, setDownloading] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
     setSelectedQuality(episode.videoSources?.[0]);
     setIsBookmarked(store.isBookmarked(animeId));
-    // Add to history automatically
+    // Auto-add to history
     if (anime) {
-      store.addHistory({
-        animeId,
-        title: anime.title,
-        poster: anime.poster,
-        cover: anime.cover,
-        thumbnail: anime.thumbnail,
-        genre: anime.genres?.[0]
-      }, epNum);
+      store.addHistory(
+        {
+          animeId,
+          title: anime.title,
+          poster: anime.poster,
+          cover: anime.cover,
+          thumbnail: anime.thumbnail,
+          genre: anime.genres?.[0],
+        },
+        epNum
+      );
     }
   }, [episode, animeId, anime, epNum]);
 
@@ -32,33 +33,28 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
       poster: anime.poster,
       cover: anime.cover,
       thumbnail: anime.thumbnail,
-      genre: anime.genres?.[0]
+      genre: anime.genres?.[0],
     });
     setIsBookmarked(status);
   };
 
-  const handleDownload = async () => {
-    try {
-      setDownloading(true);
-      // Resolution WAJIB sesuai dokumentasi - gunakan resolution dari selectedQuality atau default 1080p
-      const resolution = selectedQuality?.resolution || episode.resolutions?.[0] || '1080p';
-      const data = await animeApi.getDownload(animeId, epNum, resolution);
-      if (data.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
-      } else {
-        alert("Link download tidak tersedia");
-      }
-    } catch (e) {
-      console.error('[Download] Error:', e);
-      alert("Gagal mengambil link download: " + (e.message || "Unknown error"));
-    } finally {
-      setDownloading(false);
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: anime?.title,
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert("Link disalin ke clipboard!");
+      });
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-black aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 relative group">
+      {/* Video Player */}
+      <div className="bg-black aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 relative">
         {selectedQuality ? (
           <video
             key={selectedQuality.url}
@@ -69,28 +65,45 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500 font-bold uppercase tracking-widest text-xs">
-            Video source not found.
+            Video source tidak ditemukan.
           </div>
         )}
       </div>
 
+      {/* Controls Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-card border border-black/5 dark:border-white/5 rounded-[2rem]">
-        <div className="flex items-center gap-4">
-          <button 
+        {/* Left: Actions */}
+        <div className="flex items-center gap-3">
+          <button
             onClick={handleBookmark}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs transition-all ${isBookmarked ? 'bg-accent text-white shadow-hd' : 'bg-black/5 dark:bg-white/5 hover:bg-accent hover:text-white'}`}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs transition-all ${
+              isBookmarked
+                ? "bg-accent text-white shadow-hd"
+                : "bg-black/5 dark:bg-white/5 hover:bg-accent hover:text-white"
+            }`}
           >
-            {isBookmarked ? <BookmarkCheck className="w-4 h-4 fill-white" /> : <Bookmark className="w-4 h-4" />}
-            {isBookmarked ? 'BOOKMARKED' : 'BOOKMARK'}
+            {isBookmarked ? (
+              <BookmarkCheck className="w-4 h-4 fill-white" />
+            ) : (
+              <Bookmark className="w-4 h-4" />
+            )}
+            {isBookmarked ? "BOOKMARKED" : "BOOKMARK"}
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/5 rounded-2xl font-black text-xs hover:bg-accent hover:text-white transition-all">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-5 py-3 bg-black/5 dark:bg-white/5 rounded-2xl font-black text-xs hover:bg-accent hover:text-white transition-all"
+          >
             <Share2 className="w-4 h-4" /> SHARE
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex gap-2">
-            {episode.videoSources?.map((v, i) => (
+        {/* Right: Quality Selector */}
+        {episode.videoSources && episode.videoSources.length > 1 && (
+          <div className="flex flex-wrap gap-2">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest self-center mr-1">
+              Kualitas:
+            </span>
+            {episode.videoSources.map((v, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedQuality(v)}
@@ -100,19 +113,27 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
                     : "bg-transparent border-black/10 dark:border-white/10 text-gray-500 hover:border-accent"
                 }`}
               >
-                {v.resolution}
+                {v.resolution || v.quality}
               </button>
             ))}
           </div>
-          <button
-            onClick={handleDownload}
-            disabled={downloading}
-            className="flex items-center gap-2 px-8 py-3 bg-accent-gradient rounded-2xl font-black text-xs text-white shadow-hd hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-          >
-            <Download className="w-4 h-4" /> {downloading ? "PROCESSING..." : "DOWNLOAD"}
-          </button>
-        </div>
+        )}
       </div>
+
+      {/* Episode Info */}
+      {episode.resolutions && episode.resolutions.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-2">
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest self-center">Tersedia:</span>
+          {episode.resolutions.map((r, i) => (
+            <span
+              key={i}
+              className="px-3 py-1 bg-accent/5 border border-accent/10 rounded-full text-[9px] font-black uppercase tracking-widest text-accent"
+            >
+              {r}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

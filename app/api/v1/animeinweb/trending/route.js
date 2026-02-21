@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getNewAnime } from '@/lib/anime-helper';
+import { getTrendingAnime } from '@/lib/anime-helper';
 
+// Alias dari /api/v1/trending
 export const revalidate = 3600; // Cache 1 jam sesuai docs
 
 export async function GET() {
   try {
-    const data = await getNewAnime();
+    const data = await getTrendingAnime();
     return NextResponse.json({ success: true, data, total: data.length });
   } catch (error) {
-    console.error('[API] New error:', error);
+    console.error('[API] AnimeInWeb/Trending error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
