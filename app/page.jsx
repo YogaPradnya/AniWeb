@@ -4,59 +4,77 @@ import { Play, Star, Search, Bell } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import { capitalizeWords } from "@/lib/utils";
 
+const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div>
+      <h2 className="text-xl font-black text-white mb-6">{title}</h2>
+      <div className="grid grid-cols-2 shadow-hd md:grid-cols-3 xl:grid-cols-4 gap-6">
+        {items.map((anime, i) => {
+          const defaultBadge = anime.isNew ? "BARU" : (anime.episode || anime.releaseTime || `Ep ${10 - i}`);
+          return (
+            <Link 
+              key={i} 
+              href={`/anime/${anime.id || anime.slug || anime.animeId || 'new'}`}
+              className="group flex flex-col gap-3 rounded-2xl p-2 bg-transparent hover:bg-[#1B1B1B] transition-colors border border-transparent hover:border-white/5 bg-black/10"
+            >
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-hd-light border border-white/5">
+                <img 
+                  src={anime.thumbnail || anime.image || anime.poster || "https://fakeimg.pl/400x225/1B1B1B/909090"} 
+                  alt={anime.title} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                />
+                {/* Play badge overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <div className={`${badgeColor} rounded-full p-2 shadow-lg`}>
+                    <Play className="w-5 h-5 fill-white text-white translate-x-0.5" />
+                  </div>
+                </div>
+              </div>
+              <div className="px-1">
+                <h3 className="text-[13px] font-bold text-white truncate" title={anime.title}>{capitalizeWords(anime.title)}</h3>
+                <p className="text-[10px] text-gray-500 font-bold tracking-wider mt-1.5 uppercase">
+                  {defaultBadge}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const revalidate = 600; // 10 menit cache
 
 export default async function Home() {
-  const [trending, latest, newAnime] = await Promise.all([
+  const [trending, latest, newAnime, todayAnime] = await Promise.all([
     animeApi.getTrending(),
     animeApi.getLatest(),
     animeApi.getNew(),
+    animeApi.getToday(),
   ]);
 
   const popList = trending || [];
   const popular = popList.slice(0, 5); // Top 5 trending for Right Sidebar
-  const ongoing = latest?.slice(0, 10) || []; // Top 10 Latest for Ongoing section
+  
+  const sedangHangat = latest?.slice(0, 8) || []; 
+  const baruDitambahkan = newAnime?.slice(0, 8) || [];
+  const hariIni = todayAnime?.slice(0, 8) || [];
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 h-full">
-      {/* ─── CENTER CONTENT (Hero & Ongoing) ─── */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-10">
+      {/* ─── CENTER CONTENT (Hero & Sections) ─── */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-12">
         
         {/* HERO CAROUSEL */}
         <HeroSlider trending={popList} />
 
-        {/* ONGOING SECTION */}
-        <div>
-          <h2 className="text-xl font-black text-white mb-6">Ongoing</h2>
-          <div className="grid grid-cols-2 shadow-hd md:grid-cols-3 xl:grid-cols-4 gap-6">
-            {ongoing.map((anime, i) => (
-              <Link 
-                key={i} 
-                href={`/anime/${anime.id || anime.slug || anime.animeId || 'new'}`}
-                className="group flex flex-col gap-3 rounded-2xl p-2 bg-transparent hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
-              >
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-hd-light border border-white/5">
-                  <img 
-                    src={anime.thumbnail || anime.image || anime.poster} 
-                    alt={anime.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  {/* Play badge overlay */}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                    <div className="bg-[#9933FF] rounded-full p-2 shadow-lg">
-                      <Play className="w-5 h-5 fill-white text-white translate-x-0.5" />
-                    </div>
-                  </div>
-                </div>
-                <div className="px-1">
-                  <h3 className="text-sm font-bold text-white truncate" title={anime.title}>{capitalizeWords(anime.title)}</h3>
-                  <p className="text-[11px] text-gray-500 font-medium tracking-wide mt-1 uppercase">
-                    {anime.episode || anime.releaseTime || `Episode ${10 - i}`}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+        {/* GRIDS SECTIONS */}
+        <div className="space-y-12 pb-10">
+          <SectionGrid title="Sedang Hangat (Ongoing)" items={sedangHangat} badgeColor="bg-[#9933FF]" />
+          <SectionGrid title="Baru Ditambahkan" items={baruDitambahkan} badgeColor="bg-blue-600" />
+          <SectionGrid title="Anime Hari Ini" items={hariIni} badgeColor="bg-green-500" />
         </div>
 
       </div>
