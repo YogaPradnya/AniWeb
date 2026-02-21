@@ -136,17 +136,28 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
     <div className="space-y-6">
       {/* Video Player */}
       <div className="bg-black aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 relative">
-        {selectedQuality ? (
+        {!selectedQuality ? (
+          <div className="flex items-center justify-center h-full text-gray-500 font-bold uppercase tracking-widest text-xs">
+            Video source tidak ditemukan.
+          </div>
+        ) : selectedQuality.url.includes('embed') || selectedQuality.url.includes('iframe') || selectedQuality.type === 'iframe' || selectedQuality.url.includes('nanifile') || selectedQuality.url.includes('uservideo') ? (
+          <iframe
+            src={selectedQuality.url}
+            className="w-full h-full border-0"
+            allowFullScreen
+            scrolling="no"
+          />
+        ) : (
           <video
             ref={videoRef}
             controls
             playsInline
             className="w-full h-full"
+            onError={(e) => {
+              // Jika video direct gagal, log errornya.
+              console.warn("[VideoPlayer] native video failed to load:", selectedQuality.url);
+            }}
           />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500 font-bold uppercase tracking-widest text-xs">
-            Video source tidak ditemukan.
-          </div>
         )}
       </div>
 
