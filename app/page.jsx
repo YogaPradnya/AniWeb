@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Play, Star, Search, Bell } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import { capitalizeWords } from "@/lib/utils";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
   if (!items || items.length === 0) return null;
@@ -81,15 +82,7 @@ export default async function Home() {
         
         {/* Top Header */}
         <div className="flex items-center gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              autoComplete="off"
-              className="w-full bg-[#262626] text-sm text-white rounded-full py-2.5 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#9933FF] border border-white/5 placeholder:text-gray-500"
-            />
-          </div>
+          <GlobalSearch />
           <button className="flex-shrink-0 relative">
             <Bell className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
             <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500" />
