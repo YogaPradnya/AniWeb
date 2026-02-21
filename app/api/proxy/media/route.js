@@ -1,0 +1,60 @@
+import { NextResponse } from 'next/server';
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const targetUrl = searchParams.get('url');
+
+  if (!targetUrl) {
+    return new Response('Missing target URL', { status: 400 });
+  }
+
+  const range = request.headers.get('range');
+  const headers = {
+    'Referer': 'https://animeinweb.com/',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  };
+
+  if (range) {
+    headers['Range'] = range;
+  }
+
+  try {
+    // We use a longer timeout for video streams
+    const res = await fetch(targetUrl, { 
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!res.ok && res.status !== 206) {
+      console.error(`[Media Proxy] Upstream returned ${res.status} for ${targetUrl}`);
+    }
+
+    // Forward relevant headers
+    const responseHeaders = new Headers();
+    const forwardHeaders = [
+      'content-type',
+      'content-length',
+      'content-range',
+      'accept-ranges',
+      'cache-control',
+      'content-disposition'
+    ];
+
+    forwardHeaders.forEach(h => {
+      const value = res.headers.get(h);
+      if (value) responseHeaders.set(h, value);
+    });
+
+    // Add CORS for the proxy itself just in case
+    responseHeaders.set('Access-Control-Allow-Origin', '*');
+
+    return new Response(res.body, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: responseHeaders,
+    });
+  } catch (err) {
+    console.error(`[Media Proxy] Error fetching ${targetUrl}:`, err.message);
+    return new Response(`Proxy Error: ${err.message}`, { status: 500 });
+  }
+}
