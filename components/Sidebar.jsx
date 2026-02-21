@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { 
   Home, TrendingUp, Clock, List, Heart, 
   PlayCircle, CheckCircle, Tv, Film, MonitorPlay, 
-  Settings, LogOut, Calendar
+  Calendar
 } from "lucide-react";
 
 export default function Sidebar({ className = "" }) {
@@ -80,13 +80,6 @@ export default function Sidebar({ className = "" }) {
         </div>
       </nav>
 
-      <div className="mt-auto pt-6 space-y-1">
-         <div className="my-4 border-t border-white/5 mx-6"></div>
-         {renderLinks([
-           { label: "Settings", href: "/settings", icon: Settings },
-           { label: "Log Out", href: "/logout", icon: LogOut },
-         ])}
-      </div>
     </aside>
   );
 }
