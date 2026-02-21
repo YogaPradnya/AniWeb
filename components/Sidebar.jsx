@@ -6,6 +6,7 @@ import {
   PlayCircle, CheckCircle, Tv, Film, MonitorPlay, 
   Calendar
 } from "lucide-react";
+import GlobalSearch from "./GlobalSearch";
 
 export default function Sidebar({ className = "" }) {
   const pathname = usePathname();
@@ -55,11 +56,12 @@ export default function Sidebar({ className = "" }) {
 
   return (
     <aside className={`h-full flex flex-col py-6 overflow-y-auto scrollbar-hide ${className}`}>
-      {/* Logo */}
-      <div className="px-6 mb-10">
+      {/* Logo & Global Search */}
+      <div className="px-6 mb-10 space-y-6">
         <Link href="/" className="text-2xl font-black tracking-tighter text-white flex items-center">
           stream<span className="text-[#9933FF]">nime</span>
         </Link>
+        <GlobalSearch />
       </div>
 
       <nav className="flex-1 space-y-6">

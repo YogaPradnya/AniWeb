@@ -81,8 +81,7 @@ export default async function Home() {
       <div className="w-full lg:w-[320px] flex-shrink-0 flex flex-col gap-8 bg-[#1B1B1B] rounded-[2rem] p-6 border border-white/5">
         
         {/* Top Header */}
-        <div className="flex items-center gap-4">
-          <GlobalSearch />
+        <div className="flex items-center justify-end gap-4">
           <button className="flex-shrink-0 relative">
             <Bell className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
             <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500" />

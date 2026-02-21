@@ -34,14 +34,10 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
     const video = videoRef.current;
     if (!video || !selectedQuality?.url) return;
 
-    // Ensure URL is properly formatted for browser (handle literal spaces etc.)
-    let streamUrl = selectedQuality.url;
-    if (streamUrl.includes(" ")) {
-      streamUrl = streamUrl.replace(/ /g, "%20");
-    }
+    // Cleaned URL to handle spaces
+    const streamUrl = selectedQuality.url.trim().replace(/ /g, "%20");
     
-    // Log for debugging (remove in production)
-    console.log("[VideoPlayer] Loading source:", streamUrl);
+    console.log("[VideoPlayer] Source:", streamUrl);
 
     // Clean up previous HLS instance
     if (hlsRef.current) {
@@ -49,18 +45,45 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
       hlsRef.current = null;
     }
 
+    // Reset video element
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+
     if (streamUrl.includes(".m3u8")) {
       if (Hls.isSupported()) {
         const hls = new Hls({
           startLevel: -1,
-          capLevelToPlayerSize: true,
-          // Add some retry logic for unstable streams
           enableWorker: true,
-          lowLatencyMode: true,
+          xhrSetup: function (xhr, url) {
+            // Some streams might need credentials or specific headers
+            // xhr.withCredentials = false; 
+          }
         });
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
         hlsRef.current = hls;
+        
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error("[HLS] Network error", data);
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.error("[HLS] Media error", data);
+                hls.recoverMediaError();
+                break;
+              default:
+                console.error("[HLS] Unrecoverable error", data);
+                hls.destroy();
+                // Final fallback to native
+                video.src = streamUrl;
+                break;
+            }
+          }
+        });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         // Native support (Safari)
         video.src = streamUrl;
@@ -70,11 +93,16 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
       video.src = streamUrl;
     }
 
+    video.play().catch(e => console.warn("[VideoPlayer] Auto-play prevented:", e));
+
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
       }
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
     };
   }, [selectedQuality]);
 
@@ -97,8 +125,9 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
         url: window.location.href,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        alert("Link disalin ke clipboard!");
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Link disalin!");
       });
     }
   };
@@ -111,9 +140,7 @@ export default function VideoPlayer({ episode, anime, animeId, epNum }) {
           <video
             ref={videoRef}
             controls
-            autoPlay
             playsInline
-            crossOrigin="anonymous"
             className="w-full h-full"
           />
         ) : (
