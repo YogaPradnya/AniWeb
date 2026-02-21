@@ -42,3 +42,12 @@ Untuk mencegah halaman me-return 404 (Not Found), halaman tersebut sementara men
 - `app/tv`, `app/movies`, dll -> Memanggil `/api/v1/search?q=movie` atau `/api/v1/list` sebagai fallback data sementara.
 
 Jika API di masa depan telah merespons query param di atas, data grid anime tersebut akan secara otomatis menyesuaikan.
+
+---
+
+## 5. Sinkronisasi Langsung Upstream (Hotfix Pencarian & Video)
+
+Frontend sekarang telah dikonfigurasi untuk melakukan **fallback** langsung ke upstream API `animeinweb.com` jika data dari Vercel API kosong atau tidak valid:
+
+- **Search**: Mencoba memanggil endpoint asli `/api/proxy/3/2/explore/movie` menggunakan header `Referer` yang disamarkan.
+- **Video**: Mengambil sumber video tambahan langsung dari API streaming asli `/api/proxy/3/2/episode/streamnew/{episode_id}` untuk memastikan pemutar video tidak memunculkan error "No supported format".
