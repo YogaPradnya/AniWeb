@@ -1,6 +1,6 @@
 import { animeApi } from "@/lib/api";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Server, ListVideo } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
 
 export default async function WatchPage({ params }) {
@@ -17,15 +17,15 @@ export default async function WatchPage({ params }) {
   } catch (e) {
     console.error("[Watch] Error:", e.message);
     return (
-      <div className="text-center py-32 text-red-500 font-black uppercase tracking-widest">
-        Data episode tidak ditemukan atau API error.
+      <div className="h-full flex items-center justify-center text-red-500 font-black uppercase tracking-widest bg-[#1B1B1B] rounded-[2rem]">
+        Data episode tidak ditemukan
       </div>
     );
   }
 
   if (!episodeData) {
     return (
-      <div className="text-center py-32 text-red-500 font-black uppercase tracking-widest">
+      <div className="h-full flex items-center justify-center text-red-500 font-black uppercase tracking-widest bg-[#1B1B1B] rounded-[2rem]">
         Episode tidak tersedia.
       </div>
     );
@@ -39,6 +39,7 @@ export default async function WatchPage({ params }) {
   const currentIdx = sortedEps.findIndex(
     (e) => String(e.episodeNumber || e.number || "") === String(ep)
   );
+  
   const hasNext = currentIdx !== -1 && currentIdx < sortedEps.length - 1;
   const nextEpNum = hasNext
     ? sortedEps[currentIdx + 1]?.episodeNumber || sortedEps[currentIdx + 1]?.number
@@ -46,143 +47,137 @@ export default async function WatchPage({ params }) {
   const hasPrev = parseInt(ep) > 1;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12">
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Main Player Section */}
-        <div className="flex-grow min-w-0 space-y-8">
-          <div>
-            {anime && (
-              <Link
-                href={`/anime/${id}`}
-                className="inline-flex items-center gap-2 text-[10px] font-black text-accent hover:text-white uppercase tracking-[0.2em] transition-colors mb-4"
-              >
-                <ChevronLeft className="w-4 h-4" /> {anime.title}
-              </Link>
-            )}
-            <h1 className="text-4xl font-black tracking-tighter leading-tight italic">
-              {episodeData.title || `Episode ${ep}`}
-            </h1>
-            {/* Video Sources Info */}
-            {episodeData.videoSources?.length > 0 && (
-              <p className="text-xs font-bold text-gray-400 mt-2 uppercase tracking-widest">
-                {episodeData.videoSources.length} video source tersedia •{" "}
-                {episodeData.resolutions?.join(", ")}
-              </p>
-            )}
-          </div>
+    <div className="flex flex-col xl:flex-row gap-8">
+      {/* ─── LEFT: MAIN PLAYER AREA ─── */}
+      <div className="flex-1 min-w-0 space-y-6">
+        
+        {/* Header Info */}
+        <div className="bg-[#1B1B1B] p-6 lg:p-8 rounded-[2rem] border border-white/5 shadow-hd-light space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              {anime && (
+                <Link
+                  href={`/anime/${id}`}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-[#9933FF] hover:text-white transition-colors mb-2"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Back to {anime.title}
+                </Link>
+              )}
+              <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                {episodeData.title || `Episode ${ep}`}
+              </h1>
+            </div>
 
-          <VideoPlayer episode={episodeData} anime={anime} animeId={id} epNum={ep} />
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-4">
-              {hasPrev && (
+            {/* Navigation Buttons */}
+            <div className="flex items-center gap-3 shrink-0">
+              {hasPrev ? (
                 <Link
                   href={`/watch/${id}/${parseInt(ep) - 1}`}
-                  className="flex items-center gap-3 px-8 py-4 bg-card border border-black/5 dark:border-white/5 rounded-[2rem] text-sm font-black uppercase tracking-widest hover:border-accent transition-all shadow-hd-light"
+                  className="flex items-center justify-center w-10 h-10 bg-[#262626] hover:bg-white/10 border border-white/5 rounded-full text-white transition-colors"
+                  title="Previous Episode"
                 >
-                  <ChevronLeft className="w-5 h-5" /> Previous
+                  <ChevronLeft className="w-5 h-5" />
                 </Link>
+              ) : (
+                <div className="w-10 h-10 flex items-center justify-center bg-[#262626]/50 rounded-full text-white/20 border border-white/5 cursor-not-allowed">
+                  <ChevronLeft className="w-5 h-5" />
+                </div>
               )}
-              {hasNext && (
+              
+              {hasNext ? (
                 <Link
                   href={`/watch/${id}/${nextEpNum}`}
-                  className="flex items-center gap-3 px-8 py-4 bg-accent-gradient text-white rounded-[2rem] text-sm font-black uppercase tracking-widest hover:scale-105 transition-all shadow-hd"
+                  className="flex items-center gap-2 px-6 h-10 bg-[#9933FF] hover:opacity-90 active:scale-95 text-white font-bold text-sm tracking-wide rounded-full shadow-[0_5px_15px_rgba(153,51,255,0.3)] transition-all shrink-0"
                 >
-                  Next <ChevronRight className="w-5 h-5" />
+                  Next <ChevronRight className="w-4 h-4" />
                 </Link>
+              ) : (
+                <div className="flex items-center gap-2 px-6 h-10 bg-[#262626]/50 text-white/30 border border-white/5 font-bold text-sm tracking-wide rounded-full cursor-not-allowed shrink-0">
+                  Next <ChevronRight className="w-4 h-4" />
+                </div>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="w-full lg:w-[380px] flex-shrink-0">
-          {anime && (
-            <div className="bg-card border border-black/5 dark:border-white/5 rounded-[2.5rem] p-8 sticky top-24 shadow-hd-light">
-              <img
-                src={anime.poster || anime.thumbnail}
-                alt={anime.title}
-                className="w-full aspect-[2/3] object-cover rounded-3xl mb-8 shadow-hd transition-transform duration-500 hover:scale-105"
-              />
-              <h2 className="text-2xl font-black mb-6 leading-tight italic">
-                {anime.title}
-              </h2>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="p-4 bg-black/5 dark:bg-white/5 rounded-2xl">
-                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                    Status
-                  </p>
-                  <p className="text-xs font-bold uppercase">{anime.status || "N/A"}</p>
-                </div>
-                <div className="p-4 bg-black/5 dark:bg-white/5 rounded-2xl">
-                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                    Episode
-                  </p>
-                  <p className="text-xs font-bold">
-                    {ep} / {anime.episodes?.length || "?"}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
-                  Synopsis
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-6 leading-relaxed font-medium italic">
-                  "{anime.synopsis}"
-                </p>
-              </div>
+          
+          {episodeData.videoSources?.length > 0 && (
+            <div className="flex flex-wrap gap-4 items-center text-xs font-medium text-gray-400">
+              <span className="flex items-center gap-1.5"><Server className="w-3.5 h-3.5"/> {episodeData.videoSources.length} Servers</span>
+              <span className="flex items-center gap-1.5"><ListVideo className="w-3.5 h-3.5"/> Quality: {episodeData.resolutions?.join(", ")}</span>
             </div>
           )}
         </div>
+
+        {/* Video Player */}
+        <div className="bg-[#1B1B1B] p-2 sm:p-4 rounded-[2rem] border border-white/5 shadow-hd-light w-full">
+          <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black outline outline-1 outline-white/10 shadow-2xl relative">
+            <VideoPlayer episode={episodeData} anime={anime} animeId={id} epNum={ep} />
+          </div>
+        </div>
+
       </div>
 
-      {/* Episode List */}
-      {allEpisodes.length > 0 && (
-        <section className="pt-12 border-t border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="p-3 bg-accent/10 rounded-2xl">
-              <Play className="w-6 h-6 text-accent fill-accent" />
-            </div>
-            <h2 className="text-2xl font-black tracking-tight uppercase italic">
-              Semua Episode ({allEpisodes.length})
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {sortedEps.slice(-30).reverse().map((e, i) => {
-              const epNum = e.episodeNumber || e.number || (i + 1);
-              const isActive = String(epNum) === String(ep);
-              return (
-                <Link
-                  key={epNum}
-                  href={`/watch/${id}/${epNum}`}
-                  className={`group relative aspect-video rounded-[1.5rem] overflow-hidden border-2 transition-all duration-500 flex items-center justify-center ${
-                    isActive
-                      ? "border-accent shadow-hd bg-accent/20"
-                      : "border-transparent group-hover:border-accent/50 bg-black/5 dark:bg-white/5"
-                  }`}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Play className="w-6 h-6 text-white fill-white" />
-                  </div>
-                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] z-10 ${isActive ? "text-accent" : ""}`}>
-                    EP {epNum}
-                  </p>
+      {/* ─── RIGHT SIDEBAR (Anime Info & Episode Selection) ─── */}
+      <div className="w-full xl:w-[320px] shrink-0 space-y-6">
+        
+        {/* Anime Mini Card */}
+        {anime && (
+          <div className="bg-[#1B1B1B] p-6 rounded-[2rem] border border-white/5 sticky top-6 shadow-hd-light">
+            <div className="flex gap-4">
+              <Link href={`/anime/${id}`} className="shrink-0 group">
+                <img
+                  src={anime.poster || anime.thumbnail}
+                  alt={anime.title}
+                  className="w-24 h-32 object-cover rounded-xl shadow-hd border border-white/10 group-hover:ring-2 ring-[#9933FF] transition-all"
+                />
+              </Link>
+              <div className="flex-1 space-y-2">
+                <Link href={`/anime/${id}`}>
+                  <h2 className="text-sm font-black text-white hover:text-[#9933FF] transition-colors line-clamp-2 leading-snug">
+                    {anime.title}
+                  </h2>
                 </Link>
-              );
-            })}
-          </div>
+                <div className="flex flex-col gap-1 text-[11px] font-medium text-gray-400">
+                  <p><span className="text-gray-500">Status:</span> <span className="text-green-500">{anime.status}</span></p>
+                  <p><span className="text-gray-500">Format:</span> {anime.type || "TV"}</p>
+                  <p><span className="text-gray-500">Eps:</span> {allEpisodes.length || "?"}</p>
+                </div>
+              </div>
+            </div>
 
-          {allEpisodes.length > 30 && (
-            <p className="text-center text-xs text-gray-400 font-bold mt-6 uppercase tracking-widest">
-              Menampilkan 30 episode terakhir dari {allEpisodes.length} total — buka halaman detail untuk semua episode
-            </p>
-          )}
-        </section>
-      )}
+            <div className="mt-6 border-t border-white/5 pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black text-white">Episodes</h3>
+                <span className="text-xs font-bold text-[#9933FF] bg-[#9933FF]/10 px-2.5 py-1 rounded-md">
+                 {allEpisodes.length}
+                </span>
+              </div>
+              
+              {/* Episodes List Scrollable */}
+              <div className="grid grid-cols-5 gap-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 pb-2">
+                {sortedEps.map((e, i) => {
+                  const epNum = e.episodeNumber || e.number || (i + 1);
+                  const isActive = String(epNum) === String(ep);
+                  return (
+                    <Link
+                      key={epNum}
+                      href={`/watch/${id}/${epNum}`}
+                      className={`flex items-center justify-center aspect-square rounded-xl text-xs font-bold transition-all border ${
+                        isActive
+                          ? "bg-[#9933FF] text-white border-transparent shadow-[0_0_15px_rgba(153,51,255,0.4)]"
+                          : "bg-[#262626] text-gray-400 hover:text-white border-white/5 hover:border-white/20 hover:bg-[#333333]"
+                      }`}
+                    >
+                      {epNum}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+        
+      </div>
+
     </div>
   );
 }

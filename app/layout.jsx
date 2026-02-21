@@ -1,23 +1,23 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata = {
-  title: "AnimeOut - Nonton Anime Sub Indo Gratis HD",
-  description: "Platform streaming anime terlengkap dan tercepat dengan kualitas HD. Nonton anime favorit kamu di AnimeOut.",
+  title: "streamnime - Anime Streaming",
+  description: "Platform streaming anime terlengkap.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="id" className="dark">
-      <body className="bg-primary-light dark:bg-primary-dark text-gray-900 dark:text-white min-h-screen flex flex-col transition-colors duration-300">
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">
+      <body className="bg-[#212121] text-white h-screen flex overflow-hidden font-sans">
+        {/* Left Sidebar Fixed Width */}
+        <Sidebar className="w-[240px] flex-shrink-0 border-r border-white/5 bg-[#262626]" />
+        
+        {/* Main Content Scrollable */}
+        <main className="flex-1 overflow-y-auto px-6 py-6 pb-20 scrollbar-hide">
           {children}
         </main>
-        <Footer />
       </body>
     </html>
   );
 }
-

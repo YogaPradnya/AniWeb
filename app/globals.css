@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -15,10 +15,7 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
-  font-family: 'Inter', sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: "Inter", sans-serif;
 }
 
 /* Custom Scrollbar */
@@ -27,13 +24,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-secondary-light dark:bg-primary-dark;
+  background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  background-color: #3f3f46; /* text-zinc-700 / gray-700 equivalent */
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-accent;
+  background-color: #9933FF; /* Accent color */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -48,19 +46,20 @@ body {
   width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background-color: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+  background-color: #52525b; /* text-zinc-600 */
+  border-radius: 9999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-accent;
+  background-color: #9933FF;
 }
 
 .glass-nav {
-  @apply bg-white/80 dark:bg-primary-dark/85 backdrop-blur-xl border-b border-black/5 dark:border-white/5;
+  @apply bg-white/80 dark:bg-[#212121]/85 backdrop-blur-xl border-b border-black/5 dark:border-white/5;
 }
 
 .anime-card-hover {
-  @apply transition-all duration-500 hover:scale-[1.03] hover:shadow-hd dark:hover:shadow-[0_20px_50px_rgba(94,92,230,0.2)];
+  @apply transition-all duration-500 hover:scale-[1.03] hover:shadow-hd dark:hover:shadow-[0_20px_50px_rgba(153,51,255,0.2)];
 }

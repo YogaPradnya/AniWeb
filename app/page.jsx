@@ -1,125 +1,166 @@
 import { animeApi } from "@/lib/api";
-import AnimeCard from "@/components/AnimeCard";
-import { ChevronRight, TrendingUp, Sparkles, CalendarDays } from "lucide-react";
 import Link from "next/link";
+import { Play, Star, Search, Bell } from "lucide-react";
 
-// Disable caching untuk memastikan data selalu fresh
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-
-async function getHomeData() {
-  try {
-    // Ambil hari realtime untuk "Anime Hari Ini"
-    const getCurrentDayRealtime = () => {
-      const now = new Date();
-      const dayIndex = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
-      const dayMap = { 0: 'minggu', 1: 'senin', 2: 'selasa', 3: 'rabu', 4: 'kamis', 5: 'jumat', 6: 'sabtu' };
-      return dayMap[dayIndex] || 'senin';
-    };
-
-    const currentDay = getCurrentDayRealtime();
-    console.log(`[Home] Current realtime day: ${currentDay}`);
-
-    const [scheduleData, todayData, trendingData, newAnimeData] = await Promise.all([
-      // PASTIKAN selalu kirim parameter day ke API untuk mendapatkan data sesuai hari
-      animeApi.getSchedule(currentDay).catch((e) => {
-        console.error(`[Home] Error fetching schedule for ${currentDay}:`, e.message);
-        return { schedule: [] };
-      }),
-      // Fallback ke endpoint /today
-      animeApi.getToday().catch((e) => {
-        console.error('[Home] Error fetching today endpoint:', e.message);
-        return { data: [] };
-      }),
-      animeApi.getTrending().catch((e) => {
-        console.error('[Home] Error fetching trending:', e.message);
-        return [];
-      }),
-      animeApi.getNew().catch((e) => {
-        console.error('[Home] Error fetching new:', e.message);
-        return [];
-      }),
-    ]);
-    
-    console.log(`[Home] Schedule data for ${currentDay}:`, scheduleData?.schedule?.length || 0, 'items');
-    console.log(`[Home] Today endpoint data:`, Array.isArray(todayData) ? todayData.length : (todayData?.data?.length || 0), 'items');
-    
-    // Handle response format sesuai dokumentasi: { success: true, data: [...] }
-    const trendingList = Array.isArray(trendingData) ? trendingData : (trendingData?.data || []);
-    const newAnimeList = Array.isArray(newAnimeData) ? newAnimeData : (newAnimeData?.data || []);
-    
-    // Prioritas: schedule.schedule > today.data (sesuai dokumentasi, /today return { data: [...] })
-    const todayList = (scheduleData?.schedule && scheduleData.schedule.length > 0) 
-      ? scheduleData.schedule 
-      : (Array.isArray(todayData) ? todayData : (todayData?.data || todayData?.anime || []));
-    
-    console.log(`[Home] Final today list count:`, todayList.length);
-    
-    return { today: todayList, trending: trendingList, newAnime: newAnimeList };
-  } catch (error) {
-    console.error('[Home] Fatal error fetching data:', error);
-    return { today: [], trending: [], newAnime: [] };
-  }
-}
+export const revalidate = 600; // 10 menit cache
 
 export default async function Home() {
-  const { today, trending, newAnime } = await getHomeData();
+  const [trending, latest, newAnime] = await Promise.all([
+    animeApi.getTrending(),
+    animeApi.getLatest(),
+    animeApi.getNew(),
+  ]);
 
-  const HorizontalSection = ({ title, data, icon: Icon, colorClass }) => (
-    <section className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-2xl ${colorClass} bg-opacity-10`}>
-            <Icon className={`w-6 h-6 ${colorClass.replace('bg-', 'text-')}`} />
-          </div>
-          <div>
-            <h2 className="text-xl font-black tracking-tight uppercase">{title}</h2>
-            <div className="h-1 w-12 bg-accent rounded-full mt-1" />
-          </div>
-        </div>
-        <Link href="/schedule" className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-accent transition-all">
-          Lihat Semua <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
-      
-      <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar -mx-4 px-4 snap-x">
-        {data.length > 0 ? (
-          data.map((item, idx) => (
-            <div key={idx} className="flex-none w-[180px] md:w-[200px] snap-start">
-              <AnimeCard anime={item} />
-            </div>
-          ))
-        ) : (
-          <div className="w-full py-20 text-center border-2 border-dashed border-black/5 dark:border-white/5 rounded-[2.5rem]">
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Belum ada data tersedia</p>
-          </div>
-        )}
-      </div>
-    </section>
-  );
+  const featured = trending?.[0] || null; // Top trending as Featured (Hero)
+  const popular = trending?.slice(1, 6) || []; // Top 5 trending for Right Sidebar
+  const ongoing = latest?.slice(0, 10) || []; // Top 10 Latest for Ongoing section
 
   return (
-    <div className="space-y-4">
-      <HorizontalSection 
-        title="Anime Hari Ini" 
-        data={today} 
-        icon={CalendarDays} 
-        colorClass="bg-purple-500" 
-      />
-      
-      <HorizontalSection 
-        title="Sedang Hangat" 
-        data={trending} 
-        icon={TrendingUp} 
-        colorClass="bg-orange-500" 
-      />
-      
-      <HorizontalSection 
-        title="Baru Ditambahkan" 
-        data={newAnime} 
-        icon={Sparkles} 
-        colorClass="bg-blue-500" 
-      />
+    <div className="flex flex-col lg:flex-row gap-8 h-full">
+      {/* ─── CENTER CONTENT (Hero & Ongoing) ─── */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-10">
+        
+        {/* HERO SECTION */}
+        {featured && (
+          <div className="relative w-full aspect-[21/9] sm:aspect-[16/7] bg-[#1B1B1B] rounded-[2rem] overflow-hidden group shadow-hd-light border border-white/5">
+            {/* Background Image full width */}
+            <div 
+              className="absolute inset-0 bg-cover bg-top opacity-60 transition-transform duration-1000 group-hover:scale-105"
+              style={{ backgroundImage: `url(${featured.cover || featured.poster || featured.image})` }}
+            />
+            {/* Gradient Overlay left-to-right fade to black */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1B1B1B] via-[#1B1B1B]/80 to-transparent" />
+            
+            <div className="relative h-full flex items-center p-8 sm:p-12 z-10 w-[70%]">
+              <div className="space-y-4">
+                <p className="text-white/60 font-semibold uppercase tracking-widest text-xs">
+                  Trending #1 &bull; TV Series
+                </p>
+                <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight break-words line-clamp-2">
+                  {featured.title}
+                </h1>
+                
+                {/* Rating Stars (Mock since API rank views) */}
+                <div className="flex gap-1 items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-4 h-4 ${i < 4 ? "fill-orange-400 text-orange-400" : "text-gray-600"}`} />
+                  ))}
+                  <span className="text-sm font-bold text-white/50 ml-2">4.8</span>
+                </div>
+
+                <p className="text-sm text-white/60 line-clamp-2 mt-2 leading-relaxed">
+                  Join the adventure of {featured.title} in an epic journey. This is currently the most viewed anime on streamnime!
+                </p>
+
+                <div className="pt-4">
+                  <Link 
+                    href={`/anime/${featured.id || featured.slug || featured.animeId}`}
+                    className="inline-flex items-center justify-center bg-white text-black px-8 py-3 rounded-full font-bold text-sm tracking-wide gap-2 hover:bg-[#9933FF] hover:text-white transition-all shadow-lg active:scale-95"
+                  >
+                    Stream
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ONGOING SECTION */}
+        <div>
+          <h2 className="text-xl font-black text-white mb-6">Ongoing</h2>
+          <div className="grid grid-cols-2 shadow-hd md:grid-cols-3 xl:grid-cols-4 gap-6">
+            {ongoing.map((anime, i) => (
+              <Link 
+                key={i} 
+                href={`/anime/${anime.id || anime.slug || anime.animeId || 'new'}`}
+                className="group flex flex-col gap-3 rounded-2xl p-2 bg-transparent hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+              >
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-hd-light border border-white/5">
+                  <img 
+                    src={anime.thumbnail || anime.image || anime.poster} 
+                    alt={anime.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Play badge overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <div className="bg-[#9933FF] rounded-full p-2 shadow-lg">
+                      <Play className="w-5 h-5 fill-white text-white translate-x-0.5" />
+                    </div>
+                  </div>
+                </div>
+                <div className="px-1">
+                  <h3 className="text-sm font-bold text-white truncate">{anime.title}</h3>
+                  <p className="text-[11px] text-gray-500 font-medium tracking-wide mt-1 uppercase">
+                    {anime.episode || anime.releaseTime || `Episode ${10 - i}`}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ─── RIGHT SIDEBAR (Search & Popular) ─── */}
+      <div className="w-full lg:w-[320px] flex-shrink-0 flex flex-col gap-8 bg-[#1B1B1B] rounded-[2rem] p-6 border border-white/5">
+        
+        {/* Top Header */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              autoComplete="off"
+              className="w-full bg-[#262626] text-sm text-white rounded-full py-2.5 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#9933FF] border border-white/5 placeholder:text-gray-500"
+            />
+          </div>
+          <button className="flex-shrink-0 relative">
+            <Bell className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
+            <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500" />
+          </button>
+          <div className="w-10 h-10 rounded-full border-2 border-[#9933FF] overflow-hidden flex-shrink-0 cursor-pointer shadow-[0_0_15px_rgba(153,51,255,0.3)]">
+            <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" className="w-full h-full object-cover" />
+          </div>
+        </div>
+
+        {/* Popular List */}
+        <div className="flex-1 flex flex-col">
+          <h2 className="text-lg font-black text-white mb-6">Popular This Week</h2>
+          <div className="flex flex-col gap-5 flex-1">
+            {popular.map((item, i) => (
+              <Link 
+                key={i} 
+                href={`/anime/${item.id || item.slug || item.animeId}`}
+                className="flex gap-4 items-center group"
+              >
+                <img 
+                  src={item.poster || item.thumbnail || item.image || "https://wsrv.nl/?url=https://fakeimg.pl/60x80/282828/909090"} 
+                  alt={item.title} 
+                  className="w-16 h-20 object-cover rounded-xl shadow-lg group-hover:ring-1 ring-[#9933FF] transition-all"
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-[13px] font-bold text-white truncate">{item.title}</h4>
+                  <p className="text-[10px] text-gray-400 line-clamp-2 mt-1 mb-1 leading-relaxed">
+                    Action, Adventure, Fantasy, Sci-Fi, Slice of Life
+                  </p>
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`w-3 h-3 ${i < 4 ? "fill-orange-400 text-orange-400" : "text-gray-600"}`} />
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <button className="w-full mt-6 py-3.5 rounded-xl bg-[#9933FF] text-white font-bold text-sm tracking-wide shadow-[0_5px_15px_rgba(153,51,255,0.3)] hover:opacity-90 active:scale-95 transition-all">
+            See More
+          </button>
+        </div>
+
+      </div>
+
     </div>
   );
 }

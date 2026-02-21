@@ -11,21 +11,23 @@ module.exports = {
       colors: {
         primary: {
           light: "#ffffff",
-          dark: "#0b0c11",
+          dark: "#212121",
         },
-        secondary: {
-          light: "#f3f4f6",
-          dark: "#14161e",
+        sidebar: {
+          dark: "#262626",
+        },
+        rightside: {
+          dark: "#1B1B1B",
         },
         card: {
           light: "#ffffff",
           dark: "#1c1f2a",
         },
-        accent: "#5e5ce6",
+        accent: "#9933FF",
         "accent-purple": "#a259ff",
       },
       backgroundImage: {
-        'accent-gradient': 'linear-gradient(135deg, #5e5ce6 0%, #a259ff 100%)',
+        'accent-gradient': 'linear-gradient(135deg, #9933FF 0%, #B266FF 100%)',
       },
       boxShadow: {
         'hd': '0 20px 50px rgba(0, 0, 0, 0.3)',
