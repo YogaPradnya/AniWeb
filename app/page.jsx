@@ -71,7 +71,6 @@ export default async function Home() {
 
         {/* GRIDS SECTIONS */}
         <div className="space-y-12 pb-10">
-          <SectionGrid title="Jadwal Rilis" items={jadwalRilis} badgeColor="bg-green-500" />
           <SectionGrid title="Ongoing" items={ongoing} badgeColor="bg-[#9933FF]" />
         </div>
 
