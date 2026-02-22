@@ -36,17 +36,12 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
     video.removeAttribute("src");
     video.load();
 
-    const needsProxy = !streamUrl.includes(".m3u8") && 
-                       !selectedQuality.url.includes('embed') && 
-                       !selectedQuality.url.includes('iframe') && 
-                       selectedQuality.type !== 'iframe' && 
-                       !selectedQuality.url.includes('nanifile') && 
-                       !selectedQuality.url.includes('uservideo') &&
-                       (streamUrl.includes('animein.net') || streamUrl.includes('storages'));
+    // Kita nonaktifkan proxy untuk sementara waktu karena membuat file .mp4 
+    // diproxy melalui server Next.js yang menyebabkan proses download bergiga-giga 
+    // sebelum video bisa diputar (Bottleneck & Transferred size membengkak).
+    const needsProxy = false; 
 
-    const finalUrl = needsProxy 
-      ? `/api/proxy/media?url=${encodeURIComponent(streamUrl)}` 
-      : streamUrl;
+    const finalUrl = streamUrl;
 
     const resumeAtSavedTime = () => {
       if (currentTimeRef.current > 0) {
