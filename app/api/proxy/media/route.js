@@ -16,13 +16,19 @@ export async function GET(request) {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   };
 
-  // KUNCI SOLUSI: Kita HAPUS paksaan batas 5MB per sesi.
-  // Kenapa? Karena banyak video MP4 memiliki "Meta Data" (kunci putar video) letaknya di AKHIR FILE.
-  // Jika kita paksakan 5MB, browser terpaksa mendownload rentetan panjang ratusan sesi 5MB dari awal 
-  // hanya untuk mencari "Kunci Putar" tersebut di bagian tersumbunyi di belakang, ini yang bikin tunggu lama!
-  // Kita biarkan Browser pintar mengendalikan `Range` dan melompat bebas ke akhir file untuk mengambil kuncinya secara instan.
+  // KUNCI PROGRESSIVE STREAMING 2MB:
   if (range) {
+    // 1. Jika browser sudah meminta bagian spesifik (contoh: bagian belakang video untuk mencari file Moov/Metadata),
+    // kita HARUS membiarkannya. Jangan diganggu agar video bisa diputar instan tanpa buffering.
     headers['Range'] = range;
+  } else {
+    // 2. Jika browser baru PERTAMA KALI meload (tidak mengirim Range), kita paksa server 
+    // hanya mengirimkan 2 MB data awal. Ini memaksa server menjawab dengan "206 Partial Content", 
+    // yang akhirnya membuat browser PAHAM bahwa video ini bisa di "Skip/Seek" dan aman diputar sebagian.
+    const isVideo = targetUrl.includes('.mp4') || targetUrl.includes('storages.animein');
+    if (isVideo) {
+      headers['Range'] = 'bytes=0-2097152'; // Pancingan 2 MB
+    }
   }
 
   try {
