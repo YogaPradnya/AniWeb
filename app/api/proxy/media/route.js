@@ -18,21 +18,10 @@ export async function GET(request) {
 
   // KUNCI PROGRESSIVE STREAMING 2MB:
   if (range) {
-    // 1. Jika browser sudah meminta bagian spesifik (contoh: bagian belakang video untuk mencari file Moov/Metadata),
-    // kita HARUS membiarkannya. Jangan diganggu agar video bisa diputar instan tanpa buffering.
     headers['Range'] = range;
-  } else {
-    // 2. Jika browser baru PERTAMA KALI meload (tidak mengirim Range), kita paksa server 
-    // hanya mengirimkan 2 MB data awal. Ini memaksa server menjawab dengan "206 Partial Content", 
-    // yang akhirnya membuat browser PAHAM bahwa video ini bisa di "Skip/Seek" dan aman diputar sebagian.
-    const isVideo = targetUrl.includes('.mp4') || targetUrl.includes('storages.animein');
-    if (isVideo) {
-      headers['Range'] = 'bytes=0-2097152'; // Pancingan 2 MB
-    }
   }
 
   try {
-    // We use a longer timeout for video streams
     const res = await fetch(targetUrl, { 
       headers,
       cache: 'no-store'
@@ -42,32 +31,21 @@ export async function GET(request) {
       console.error(`[Media Proxy] Upstream returned ${res.status} for ${targetUrl}`);
     }
 
-    // Forward relevant headers
+    // Proxy 100% Transparan: Teruskan semua header dari server asli ke browser
+    // Ini PENTING agar browser mendeteksi "Content-Length" dan "Accept-Ranges" dengan akurat
     const responseHeaders = new Headers();
-    const forwardHeaders = [
-      'content-type',
-      'content-length',
-      'content-range',
-      'accept-ranges',
-      'content-disposition'
-    ];
-
-    forwardHeaders.forEach(h => {
-      const value = res.headers.get(h);
-      if (value) responseHeaders.set(h, value);
+    res.headers.forEach((value, key) => {
+      // Abaikan kompresi agar browser tidak bingung
+      if (key.toLowerCase() !== 'content-encoding') {
+        responseHeaders.set(key, value);
+      }
     });
 
-    // Strategy: Cache small segments (like .ts) but not the whole video stream if it's a main file
-    // However, for proxying anime streams, a short public cache helps with stability.
-    if (res.status === 200) {
-      responseHeaders.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-    } else {
-      responseHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-
-    // Add CORS for the proxy itself
+    // Paksakan dukungan 'seek/lompat' ke browser
+    responseHeaders.set('Accept-Ranges', 'bytes');
     responseHeaders.set('Access-Control-Allow-Origin', '*');
-
+    
+    // Jangan ubah status HTTP sama sekali (terutama 206 Partial Content)
     return new Response(res.body, {
       status: res.status,
       statusText: res.statusText,
