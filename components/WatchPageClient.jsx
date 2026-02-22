@@ -220,6 +220,7 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
                   <Link
                     key={epNum}
                     href={`/watch/${id}/${epNum}`}
+                    prefetch={false}
                     className={`flex items-center justify-center aspect-square rounded-lg text-xs font-bold transition-all border ${
                       isActive
                         ? "bg-[#9933FF] text-white border-transparent shadow-[0_0_12px_rgba(153,51,255,0.4)]"

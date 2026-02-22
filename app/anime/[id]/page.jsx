@@ -217,6 +217,7 @@ export default function DetailPage({ params }) {
                    <Link
                      key={epNum}
                      href={`/watch/${id}/${epNum}`}
+                     prefetch={false}
                      className="group flex flex-col items-center justify-center bg-[#262626] hover:bg-[#9933FF] border border-white/5 p-4 rounded-xl transition-colors duration-300"
                    >
                      <span className="text-xs text-gray-400 hover:text-white group-hover:text-white/80 font-medium uppercase tracking-widest mb-1">
