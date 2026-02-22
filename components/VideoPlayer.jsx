@@ -53,45 +53,65 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
         video.currentTime = currentTimeRef.current;
       }
       setIsLoading(false);
-      video.play().catch(e => console.warn("[VideoPlayer] Auto-play prevented:", e));
+      // Aggressive play start
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          console.warn("[VideoPlayer] Auto-play prevented, waiting for interaction:", e);
+          // Fallback: stay on loading OR show a big play button
+          setIsLoading(false);
+        });
+      }
     };
 
     if (streamUrl.includes(".m3u8")) {
       if (Hls.isSupported()) {
         const hls = new Hls({ 
-          startLevel: -1, 
+          startLevel: 0, // FORCE START AT LOWEST QUALITY FOR INSTANT PLAY
           enableWorker: true,
           lowLatencyMode: true,
           backBufferLength: 60,
-          maxBufferLength: 30,
-          maxMaxBufferLength: 60,
-          manifestLoadingTimeOut: 10000,
-          levelLoadingTimeOut: 10000,
-          fragLoadingTimeOut: 20000,
-          fragLoadingMaxRetry: 5,
-          levelLoadingMaxRetry: 5,
-          manifestLoadingMaxRetry: 5,
+          maxBufferLength: 5, // Small buffer to start ASAP
+          maxMaxBufferLength: 10,
+          maxBufferSize: 30 * 1000 * 1000,
+          manifestLoadingTimeOut: 5000,
+          levelLoadingTimeOut: 5000,
+          fragLoadingTimeOut: 10000,
+          fragLoadingMaxRetry: 10,
+          levelLoadingMaxRetry: 10,
+          manifestLoadingMaxRetry: 10,
+          startFragPrefetch: true,
+          testBandwidth: false,
+          maxBufferHole: 0.5,
+          nudgeOffset: 0.1,
+          nudgeMaxRetry: 10,
         });
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
         hlsRef.current = hls;
         
-        hls.on(Hls.Events.MANIFEST_PARSED, resumeAtSavedTime);
-        hls.on(Hls.Events.FRAG_BUFFERED, () => setIsLoading(false));
+        hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+          // Immediately try to play as soon as manifest is ready
+          resumeAtSavedTime();
+        });
+
+        hls.on(Hls.Events.FRAG_BUFFERED, () => {
+          if (isLoading) setIsLoading(false);
+        });
         
         hls.on(Hls.Events.ERROR, function (event, data) {
           if (data.fatal) {
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
-                console.error("[VideoPlayer] Network error, trying to recover...");
+                console.error("[VideoPlayer] Network fatal, recovering...");
                 hls.startLoad();
                 break;
               case Hls.ErrorTypes.MEDIA_ERROR:
-                console.error("[VideoPlayer] Media error, trying to recover...");
+                console.error("[VideoPlayer] Media fatal, recovering...");
                 hls.recoverMediaError();
                 break;
               default:
-                console.error("[VideoPlayer] Fatal error, destroying and falling back to native...");
+                console.error("[VideoPlayer] Unrecoverable error, switching to native source");
                 hls.destroy();
                 video.src = finalUrl;
                 break;
@@ -109,14 +129,14 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
 
     const handleWaiting = () => setIsLoading(true);
     const handlePlaying = () => setIsLoading(false);
-    const handleError = (e) => {
-      console.warn("[VideoPlayer] native video failed to load:", selectedQuality.url);
+    const handleCanPlay = () => {
       setIsLoading(false);
-      setError("Gagal memuat video.");
+      video.play().catch(() => {});
     };
 
     video.addEventListener('waiting', handleWaiting);
     video.addEventListener('playing', handlePlaying);
+    video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('error', handleError);
 
     return () => {
@@ -129,6 +149,7 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
       }
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('error', handleError);
     };
   }, [selectedQuality]);
@@ -149,18 +170,18 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
       ) : (
         <>
           {isLoading && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
-               <div className="w-12 h-12 border-4 border-[#9933FF]/20 border-t-[#9933FF] rounded-full animate-spin mb-4" />
-               <p className="text-[#9933FF] font-black text-[10px] uppercase tracking-[0.2em] animate-pulse">Buffering...</p>
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-300 pointer-events-none">
+               <div className="w-10 h-10 border-4 border-[#9933FF]/20 border-t-[#9933FF] rounded-full animate-spin mb-3" />
+               <p className="text-[#9933FF] font-black text-[9px] uppercase tracking-[0.3em] animate-pulse">Fast Loading...</p>
             </div>
           )}
           
           {error && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md">
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md">
                <p className="text-red-500 font-black text-xs uppercase tracking-widest mb-4">{error}</p>
                <button 
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-full text-[10px] font-bold text-white transition-all border border-white/10"
+                className="px-6 py-2 bg-[#9933FF] hover:opacity-90 rounded-full text-[10px] font-bold text-white transition-all shadow-lg"
                >
                  COBA LAGI
                </button>
@@ -172,7 +193,9 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
             controls
             playsInline
             preload="auto"
-            className="w-full h-full"
+            autoPlay
+            muted={false}
+            className="w-full h-full object-contain"
           />
         </>
       )}
