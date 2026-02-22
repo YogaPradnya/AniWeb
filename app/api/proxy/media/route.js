@@ -10,35 +10,19 @@ export async function GET(request) {
     return new Response('Missing target URL', { status: 400 });
   }
 
-  let range = request.headers.get('range');
+  const range = request.headers.get('range');
   const headers = {
     'Referer': 'https://animeinweb.com/',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   };
 
-  // Implementasi Chunk Download (IDM-style progressive loading)
-  // Sangat penting untuk MENCEGAH Next.js mencoba mentransfer seluruh ukuran 200MB+ sekaligus.
-  const isVideo = targetUrl.includes('.mp4') || targetUrl.includes('storages.animein');
-  const CHUNK_SIZE = 5 * 1024 * 1024; // Paksakan 5 MB per request ke server aslinya
-
+  // KUNCI SOLUSI: Kita HAPUS paksaan batas 5MB per sesi.
+  // Kenapa? Karena banyak video MP4 memiliki "Meta Data" (kunci putar video) letaknya di AKHIR FILE.
+  // Jika kita paksakan 5MB, browser terpaksa mendownload rentetan panjang ratusan sesi 5MB dari awal 
+  // hanya untuk mencari "Kunci Putar" tersebut di bagian tersumbunyi di belakang, ini yang bikin tunggu lama!
+  // Kita biarkan Browser pintar mengendalikan `Range` dan melompat bebas ke akhir file untuk mengambil kuncinya secara instan.
   if (range) {
-    if (isVideo) {
-      const parts = range.replace(/bytes=/, "").split("-");
-      const start = parseInt(parts[0], 10) || 0;
-      let browserEnd = parts[1] ? parseInt(parts[1], 10) : null;
-      let end = start + CHUNK_SIZE - 1;
-      
-      if (browserEnd !== null && browserEnd < end) {
-        end = browserEnd;
-      }
-      
-      headers['Range'] = `bytes=${start}-${end}`;
-    } else {
-      headers['Range'] = range;
-    }
-  } else if (isVideo) {
-    // Jika browser tidak mengirimkan Range di awal (biasanya saat pertama kali mendarat), paksakan chunking.
-    headers['Range'] = `bytes=0-${CHUNK_SIZE - 1}`;
+    headers['Range'] = range;
   }
 
   try {
