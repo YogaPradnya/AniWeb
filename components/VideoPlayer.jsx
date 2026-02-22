@@ -133,6 +133,11 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
       setIsLoading(false);
       video.play().catch(() => {});
     };
+    const handleError = (e) => {
+      console.warn("[VideoPlayer] native video failed to load:", selectedQuality.url);
+      setIsLoading(false);
+      setError("Gagal memuat video.");
+    };
 
     video.addEventListener('waiting', handleWaiting);
     video.addEventListener('playing', handlePlaying);
