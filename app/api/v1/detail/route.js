@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAnimeDetail, getMovieDetailUpstream, getEpisodeListUpstream } from '@/lib/anime-helper';
+import { getAnimeDetail, getMovieDetailUpstream, getAllEpisodesUpstream } from '@/lib/anime-helper';
 
 export const revalidate = 1800; // Cache 30 menit sesuai docs
 
@@ -20,7 +20,7 @@ export async function GET(request) {
       try {
         const [movieDetail, episodeList] = await Promise.all([
           getMovieDetailUpstream(identifier),
-          getEpisodeListUpstream(identifier)
+          getAllEpisodesUpstream(identifier)
         ]);
         
         if (movieDetail) {
