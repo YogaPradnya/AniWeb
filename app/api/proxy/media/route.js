@@ -8,14 +8,35 @@ export async function GET(request) {
     return new Response('Missing target URL', { status: 400 });
   }
 
-  const range = request.headers.get('range');
+  let range = request.headers.get('range');
   const headers = {
     'Referer': 'https://animeinweb.com/',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   };
 
+  // Implementasi Chunk Download Server-Side
+  // Membagi payload (contoh 5MB per chunk) agar buffering tidak menyedot memori besar sekaligus
+  const isVideo = targetUrl.includes('.mp4') || targetUrl.includes('storages.animein');
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB per request
+
   if (range) {
-    headers['Range'] = range;
+    if (isVideo) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10) || 0;
+      const browserEnd = parts[1] ? parseInt(parts[1], 10) : null;
+      let end = start + CHUNK_SIZE - 1;
+      
+      if (browserEnd !== null && browserEnd < end) {
+        end = browserEnd;
+      }
+      
+      headers['Range'] = `bytes=${start}-${end}`;
+    } else {
+      headers['Range'] = range;
+    }
+  } else if (isVideo) {
+    // Force partial request jika browser awalnya tidak meminta
+    headers['Range'] = `bytes=0-${CHUNK_SIZE - 1}`;
   }
 
   try {
