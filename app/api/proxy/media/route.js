@@ -36,7 +36,6 @@ export async function GET(request) {
       'content-length',
       'content-range',
       'accept-ranges',
-      'cache-control',
       'content-disposition'
     ];
 
@@ -45,7 +44,15 @@ export async function GET(request) {
       if (value) responseHeaders.set(h, value);
     });
 
-    // Add CORS for the proxy itself just in case
+    // Strategy: Cache small segments (like .ts) but not the whole video stream if it's a main file
+    // However, for proxying anime streams, a short public cache helps with stability.
+    if (res.status === 200) {
+      responseHeaders.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    } else {
+      responseHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+
+    // Add CORS for the proxy itself
     responseHeaders.set('Access-Control-Allow-Origin', '*');
 
     return new Response(res.body, {
