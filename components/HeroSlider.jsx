@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, Play, ChevronLeft, ChevronRight } from "lucide-react";
 
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, fixImageUrl } from "@/lib/utils";
 
 export default function HeroSlider({ trending }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -26,7 +26,7 @@ export default function HeroSlider({ trending }) {
 
   const currentItem = slides[currentIndex];
   // Prioritas Cover untuk Hero/Landscape
-  const bgImage = currentItem.cover || currentItem.thumbnail || currentItem.poster || currentItem.image || "https://fakeimg.pl/800x400/1B1B1B/909090";
+  const bgImage = fixImageUrl(currentItem.image_cover || currentItem.cover || currentItem.image_poster || currentItem.poster || currentItem.thumbnail || currentItem.image || "https://fakeimg.pl/800x400/1B1B1B/909090");
 
   const nextSlide = () => setCurrentIndex(prev => prev === slides.length - 1 ? 0 : prev + 1);
   const prevSlide = () => setCurrentIndex(prev => prev === 0 ? slides.length - 1 : prev - 1);

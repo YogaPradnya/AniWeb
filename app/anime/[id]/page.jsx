@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
 import { Play, Star, Calendar, User, Tv, Bookmark, BookmarkCheck, Share2, ChevronDown, Search, Heart, Clock } from "lucide-react";
 import { store } from "@/lib/store";
+import { fixImageUrl } from "@/lib/utils";
 
 export default function DetailPage({ params }) {
   const id = params.id;
@@ -78,8 +79,8 @@ export default function DetailPage({ params }) {
     const status = store.toggleBookmark({
       animeId: id,
       title: anime.title,
-      poster: anime.poster,
-      cover: anime.cover,
+      poster: anime.poster || anime.image_poster,
+      cover: anime.cover || anime.image_cover,
       thumbnail: anime.thumbnail,
       genre: anime.genres?.[0]
     });
@@ -98,8 +99,8 @@ export default function DetailPage({ params }) {
     </div>
   );
 
-  const coverImage = anime.cover || anime.poster || anime.thumbnail || "https://fakeimg.pl/800x400/1B1B1B/909090";
-  const posterImage = anime.poster || anime.thumbnail || coverImage;
+  const coverImage = fixImageUrl(anime.cover || anime.image_cover || anime.poster || anime.image_poster || anime.thumbnail || "https://fakeimg.pl/800x400/1B1B1B/909090");
+  const posterImage = fixImageUrl(anime.poster || anime.image_poster || anime.thumbnail || coverImage);
 
   return (
     <div className="flex flex-col xl:flex-row gap-8">

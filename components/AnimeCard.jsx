@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Eye, Heart, Star, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { store } from "@/lib/store";
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, fixImageUrl } from "@/lib/utils";
 
 export default function AnimeCard({ anime, isEpisode = false }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -16,7 +16,7 @@ export default function AnimeCard({ anime, isEpisode = false }) {
   
   // Handle both 'animeId' and 'id' field names (sesuai dokumentasi API)
   const id = anime.animeId || anime.id;
-  const imageUrl = anime.poster || anime.cover || anime.thumbnail;
+  const imageUrl = fixImageUrl(anime.image_poster || anime.poster || anime.image_cover || anime.cover || anime.thumbnail || anime.image);
   const title = anime.title || 'Untitled';
   
   return (

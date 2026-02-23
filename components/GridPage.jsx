@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Play, Eye, Star } from "lucide-react";
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, fixImageUrl } from "@/lib/utils";
 
 export default function GridPage({ title, items = [], errorMsg = "No items found." }) {
   return (
@@ -21,7 +21,7 @@ export default function GridPage({ title, items = [], errorMsg = "No items found
             >
               <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-hd-light border border-white/5">
                 <img 
-                  src={anime.poster || anime.cover || anime.thumbnail || anime.image || "https://fakeimg.pl/400x600/1B1B1B/909090"} 
+                  src={fixImageUrl(anime.image_poster || anime.poster || anime.image_cover || anime.cover || anime.thumbnail || anime.image) || "https://fakeimg.pl/400x600/1B1B1B/909090"} 
                   alt={anime.title} 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                 />

@@ -2,7 +2,7 @@ import { animeApi } from "@/lib/api";
 import Link from "next/link";
 import { Play, Star, Search, Bell } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, fixImageUrl } from "@/lib/utils";
 import GlobalSearch from "@/components/GlobalSearch";
 
 const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
@@ -13,6 +13,8 @@ const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
       <div className="grid grid-cols-2 shadow-hd md:grid-cols-3 xl:grid-cols-4 gap-6">
         {items.map((anime, i) => {
           const defaultBadge = anime.isNew ? "BARU" : (anime.episode || anime.releaseTime || `Ep ${10 - i}`);
+          const imageUrl = fixImageUrl(anime.image_cover || anime.image_poster || anime.thumbnail || anime.image || anime.poster);
+          
           return (
             <Link 
               key={i} 
@@ -21,7 +23,7 @@ const SectionGrid = ({ title, items, badgeColor = "bg-[#9933FF]" }) => {
             >
               <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-hd-light border border-white/5">
                 <img 
-                  src={anime.thumbnail || anime.image || anime.poster || "https://fakeimg.pl/400x225/1B1B1B/909090"} 
+                  src={imageUrl || "https://fakeimg.pl/400x225/1B1B1B/909090"} 
                   alt={anime.title} 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
                 />
@@ -105,7 +107,7 @@ export default async function Home() {
                 className="flex gap-4 items-center group"
               >
                 <img 
-                  src={item.poster || item.thumbnail || item.image || "https://wsrv.nl/?url=https://fakeimg.pl/60x80/282828/909090"} 
+                  src={fixImageUrl(item.image_poster || item.poster || item.thumbnail || item.image) || "https://wsrv.nl/?url=https://fakeimg.pl/60x80/282828/909090"} 
                   alt={item.title} 
                   className="w-16 h-20 object-cover rounded-xl shadow-lg group-hover:ring-1 ring-[#9933FF] transition-all"
                 />

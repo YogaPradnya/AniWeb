@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Image from "next/image";
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, fixImageUrl } from "@/lib/utils";
 import { store } from "@/lib/store";
 
 export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps }) {
@@ -19,8 +19,8 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
         {
           animeId: id,
           title: anime.title,
-          poster: anime.poster,
-          cover: anime.cover,
+          poster: anime.poster || anime.image_poster,
+          cover: anime.cover || anime.image_cover,
           thumbnail: anime.thumbnail,
           genre: anime.genres?.[0],
         },
@@ -33,8 +33,8 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
     const status = store.toggleBookmark({
       animeId: id,
       title: anime.title,
-      poster: anime.poster,
-      cover: anime.cover,
+      poster: anime.poster || anime.image_poster,
+      cover: anime.cover || anime.image_cover,
       thumbnail: anime.thumbnail,
       genre: anime.genres?.[0],
     });
@@ -75,7 +75,7 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
       {anime && (
         <div className="absolute inset-0 -z-10 w-full h-[30vh] lg:h-[40vh] pointer-events-none overflow-hidden rounded-[2rem]">
           <Image
-            src={anime.cover || anime.poster || anime.thumbnail}
+            src={fixImageUrl(anime.cover || anime.image_cover || anime.poster || anime.image_poster || anime.thumbnail)}
             alt={`${anime.title} Cover`}
             fill
             className="object-cover opacity-20 blur-sm brightness-50"
@@ -197,7 +197,7 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
             <div className="flex gap-4 p-1.5">
               <Link href={`/anime/${id}`} className="shrink-0 group">
                 <img
-                  src={anime.poster || anime.thumbnail}
+                  src={fixImageUrl(anime.image_poster || anime.poster || anime.thumbnail)}
                   alt={anime.title}
                   className="w-20 lg:w-24 h-28 lg:h-32 object-cover rounded-xl shadow-hd border border-white/10 group-hover:ring-2 ring-[#9933FF] transition-all"
                 />
