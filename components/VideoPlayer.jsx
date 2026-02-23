@@ -197,8 +197,7 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
             ref={videoRef}
             controls
             playsInline
-            preload="metadata"
-            autoPlay
+            preload="none"
             muted={false}
             className="w-full h-full object-contain"
           />
