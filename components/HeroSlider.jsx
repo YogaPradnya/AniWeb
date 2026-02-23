@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Star, Play, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { capitalizeWords } from "@/lib/utils";
@@ -24,6 +25,7 @@ export default function HeroSlider({ trending }) {
   if (slides.length === 0) return null;
 
   const currentItem = slides[currentIndex];
+  // Prioritas Cover untuk Hero/Landscape
   const bgImage = currentItem.cover || currentItem.thumbnail || currentItem.poster || currentItem.image || "https://fakeimg.pl/800x400/1B1B1B/909090";
 
   const nextSlide = () => setCurrentIndex(prev => prev === slides.length - 1 ? 0 : prev + 1);
@@ -33,10 +35,17 @@ export default function HeroSlider({ trending }) {
     <div className="relative w-full aspect-[21/9] sm:aspect-[16/7] bg-[#1B1B1B] rounded-[2rem] overflow-hidden group shadow-hd-light border border-white/5">
       {/* Background Image full width - animate when sliding */}
       <div 
-        key={currentItem.animeId} // Forcing re-animation on change
-        className="absolute inset-0 bg-cover bg-top opacity-60 animate-in fade-in zoom-in duration-1000"
-        style={{ backgroundImage: `url('${bgImage}')` }}
-      />
+        key={currentItem.animeId || currentItem.id} // Forcing re-animation on change
+        className="absolute inset-0 opacity-60 animate-in fade-in zoom-in duration-1000"
+      >
+        <Image 
+          src={bgImage}
+          alt={currentItem.title}
+          fill
+          className="object-cover object-top"
+          priority
+        />
+      </div>
       {/* Gradient Overlay left-to-right fade to black */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#1B1B1B]/95 via-[#1B1B1B]/70 to-transparent" />
       

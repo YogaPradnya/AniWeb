@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
+import Image from "next/image";
 import { capitalizeWords } from "@/lib/utils";
 import { store } from "@/lib/store";
 
@@ -69,7 +70,22 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
   }, {}) || {};
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6 lg:gap-8">
+    <div className="relative flex flex-col xl:flex-row gap-6 lg:gap-8">
+      {/* 1. LAYER BANNER BACKGROUND (Menggunakan 'cover' Landscape) */}
+      {anime && (
+        <div className="absolute inset-0 -z-10 w-full h-[30vh] lg:h-[40vh] pointer-events-none overflow-hidden rounded-[2rem]">
+          <Image
+            src={anime.cover || anime.poster || anime.thumbnail}
+            alt={`${anime.title} Cover`}
+            fill
+            className="object-cover opacity-20 blur-sm brightness-50"
+            priority
+          />
+          {/* Gradien pemisah antara Banner dan bawah halaman */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent" />
+        </div>
+      )}
+
       {/* ─── LEFT: MAIN PLAYER AREA ─── */}
       <div className="flex-1 min-w-0 space-y-4 lg:space-y-6">
         

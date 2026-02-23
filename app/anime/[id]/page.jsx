@@ -1,6 +1,7 @@
 "use client";
 import { animeApi } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
 import { Play, Star, Calendar, User, Tv, Bookmark, BookmarkCheck, Share2, ChevronDown, Search, Heart, Clock } from "lucide-react";
 import { store } from "@/lib/store";
@@ -107,18 +108,26 @@ export default function DetailPage({ params }) {
         
         {/* Banner Card */}
         <div className="relative w-full aspect-[21/9] sm:aspect-[16/6] bg-[#1B1B1B] rounded-[2rem] overflow-hidden group border border-white/5 shadow-hd-light">
-          <div 
-            className="absolute inset-0 bg-cover bg-top opacity-30 transition-transform duration-1000 group-hover:scale-105"
-            style={{ backgroundImage: `url(${coverImage})` }}
-          />
+          <div className="absolute inset-0 transition-transform duration-1000 group-hover:scale-105">
+            <Image 
+              src={coverImage}
+              alt={anime.title}
+              fill
+              className="object-cover object-top opacity-30"
+              priority
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#1B1B1B] via-[#1B1B1B]/80 to-transparent" />
           
           <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 flex flex-col md:flex-row gap-8 items-end">
-            <img 
-              src={posterImage} 
-              alt={anime.title} 
-              className="w-32 h-44 sm:w-40 sm:h-56 object-cover rounded-2xl shadow-hd border-2 border-white/10 shrink-0 hidden md:block" 
-            />
+            <div className="relative w-32 h-44 sm:w-40 sm:h-56 shrink-0 hidden md:block group/poster">
+              <Image 
+                src={posterImage} 
+                alt={anime.title} 
+                fill
+                className="object-cover rounded-2xl shadow-hd border-2 border-white/10" 
+              />
+            </div>
             <div className="flex-1 space-y-3">
               <div className="flex flex-wrap gap-2 mb-2">
                 {anime.genres?.slice(0, 3).map((g, i) => (
