@@ -63,14 +63,16 @@ export default function Sidebar({ className = "" }) {
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
-      <button 
-        className="md:hidden fixed bottom-6 right-6 z-[60] p-3 bg-[#9933FF] rounded-full text-white shadow-[0_5px_15px_rgba(153,51,255,0.4)] hover:scale-105 transition-transform"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle Menu"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+      {/* Mobile Hamburger Button (Tampil saat tertutup) */}
+      {!isOpen && (
+        <button 
+          className="md:hidden fixed top-5 left-5 z-[60] p-2.5 bg-[#1B1B1B]/90 backdrop-blur-md border border-white/10 rounded-xl text-white shadow-[0_5px_15px_rgba(0,0,0,0.5)] hover:bg-[#9933FF] transition-colors"
+          onClick={() => setIsOpen(true)}
+          aria-label="Open Menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Mobile Backdrop */}
       {isOpen && (
@@ -84,14 +86,23 @@ export default function Sidebar({ className = "" }) {
       <aside 
         className={`
           fixed md:relative top-0 left-0 z-50 md:z-auto h-full flex flex-col py-6 overflow-y-auto scrollbar-hide bg-[#262626]
-          transition-transform duration-300 ease-in-out
+          transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           ${className}
         `}
       >
+        {/* Close Button Inside Sidebar (Mobile) */}
+        <button 
+          className="md:hidden absolute top-5 right-5 p-2 bg-black/20 hover:bg-[#9933FF] rounded-full text-white transition-colors"
+          onClick={() => setIsOpen(false)}
+          aria-label="Close Menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {/* Logo & Global Search */}
-        <div className="px-6 mb-10 space-y-6 flex-shrink-0">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-white flex items-center">
+        <div className="px-6 mt-1 md:mt-0 mb-10 space-y-6 flex-shrink-0">
+          <Link href="/" className="text-2xl font-black tracking-tighter text-white flex items-center pt-2 md:pt-0">
             stream<span className="text-[#9933FF]">nime</span>
           </Link>
           <GlobalSearch />
