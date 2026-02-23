@@ -44,6 +44,7 @@ export default function HeroSlider({ trending }) {
           fill
           className="object-cover object-top"
           priority
+          unoptimized
         />
       </div>
       {/* Gradient Overlay left-to-right fade to black */}

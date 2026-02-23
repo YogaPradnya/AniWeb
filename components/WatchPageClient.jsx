@@ -80,6 +80,7 @@ export default function WatchPageClient({ episodeData, anime, id, ep, sortedEps 
             fill
             className="object-cover opacity-20 blur-sm brightness-50"
             priority
+            unoptimized
           />
           {/* Gradien pemisah antara Banner dan bawah halaman */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent" />

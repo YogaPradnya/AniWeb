@@ -4,11 +4,15 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'wsrv.nl',
       },
       {
-        protocol: 'http',
-        hostname: '**',
+        protocol: 'https',
+        hostname: 'xyz-api.animein.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.animein.net',
       },
       {
         protocol: 'https',

@@ -93,7 +93,10 @@ const nextConfig = {
         hostname: "wsrv.nl",
       },
       {
-        // ⬅️ Tambahkan ini untuk akses langsung Cover & Poster
+        protocol: "https",
+        hostname: "xyz-api.animein.net",
+      },
+      {
         protocol: "https",
         hostname: "**.animein.net",
       },

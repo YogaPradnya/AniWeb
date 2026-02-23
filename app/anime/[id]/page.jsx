@@ -116,6 +116,7 @@ export default function DetailPage({ params }) {
               fill
               className="object-cover object-top opacity-30"
               priority
+              unoptimized
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#1B1B1B] via-[#1B1B1B]/80 to-transparent" />
@@ -127,6 +128,7 @@ export default function DetailPage({ params }) {
                 alt={anime.title} 
                 fill
                 className="object-cover rounded-2xl shadow-hd border-2 border-white/10" 
+                unoptimized
               />
             </div>
             <div className="flex-1 space-y-3">
