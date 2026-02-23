@@ -176,8 +176,7 @@ export default function VideoPlayer({ episode, anime, animeId, epNum, selectedQu
         <>
           {isLoading && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-300 pointer-events-none">
-               <div className="w-10 h-10 border-4 border-[#9933FF]/20 border-t-[#9933FF] rounded-full animate-spin mb-3" />
-               <p className="text-[#9933FF] font-black text-[9px] uppercase tracking-[0.3em] animate-pulse">Fast Loading...</p>
+               <div className="w-10 h-10 border-4 border-[#9933FF]/20 border-t-[#9933FF] rounded-full animate-spin" />
             </div>
           )}
           

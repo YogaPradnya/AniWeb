@@ -14,13 +14,18 @@ export default function DetailPage({ params }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [episodeSearch, setEpisodeSearch] = useState("");
+  const [related, setRelated] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await animeApi.getDetail(id);
+        const [data, trending] = await Promise.all([
+          animeApi.getDetail(id),
+          animeApi.getTrending().catch(() => [])
+        ]);
         setAnime(data);
         setIsBookmarked(store.isBookmarked(id));
+        setRelated(trending?.slice(0, 5) || []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -29,6 +34,7 @@ export default function DetailPage({ params }) {
     }
     fetchData();
   }, [id]);
+
 
   const episodes = useMemo(() => {
     if (!anime?.episodes) return [];
@@ -269,19 +275,41 @@ export default function DetailPage({ params }) {
       <div className="w-full xl:w-[300px] flex-shrink-0 flex flex-col gap-6">
         <div className="bg-[#1B1B1B] rounded-[2rem] p-6 border border-white/5 sticky top-6">
           <h3 className="text-sm font-black text-white uppercase tracking-widest mb-4">Related Anime</h3>
-          <p className="text-xs text-gray-500 mb-6 font-medium">Coming soon in next update. Stay tuned for personalized recommendations.</p>
           
           <div className="space-y-4">
-            {/* Placeholder items */}
-            {[1,2,3,4].map(i => (
-              <div key={i} className="flex gap-4 animate-pulse">
-                <div className="w-14 h-16 bg-[#262626] rounded-xl" />
-                <div className="flex-1 py-1 space-y-2">
-                  <div className="w-3/4 h-3 bg-[#262626] rounded" />
-                  <div className="w-1/2 h-2 bg-[#262626] rounded" />
+            {related.length > 0 ? (
+              related.map((item, i) => (
+                <Link 
+                  key={i} 
+                  href={`/anime/${item.id || item.slug || item.animeId}`}
+                  className="flex gap-4 items-center group"
+                >
+                  <img 
+                    src={fixImageUrl(item.image_poster || item.poster || item.thumbnail || item.image) || "https://fakeimg.pl/60x80/282828/909090"} 
+                    alt={item.title} 
+                    className="w-14 h-16 object-cover rounded-xl shadow-lg group-hover:ring-1 ring-[#9933FF] transition-all"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-[12px] font-bold text-white line-clamp-2" title={item.title}>
+                      {item.title ? item.title.replace(/\b\w/g, c => c.toUpperCase()) : 'Untitled'}
+                    </h4>
+                    <p className="text-[10px] text-gray-400 font-medium">Status: {item.status || 'Ongoing'}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Format: {item.type || 'Series'}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              // Placeholder saat loading atau data kosong
+              [1,2,3,4].map(i => (
+                <div key={i} className="flex gap-4 animate-pulse">
+                  <div className="w-14 h-16 bg-[#262626] rounded-xl" />
+                  <div className="flex-1 py-1 space-y-2">
+                    <div className="w-3/4 h-3 bg-[#262626] rounded" />
+                    <div className="w-1/2 h-2 bg-[#262626] rounded" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

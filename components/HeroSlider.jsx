@@ -25,8 +25,8 @@ export default function HeroSlider({ trending }) {
   if (slides.length === 0) return null;
 
   const currentItem = slides[currentIndex];
-  // Prioritas Cover untuk Hero/Landscape
-  const bgImage = fixImageUrl(currentItem.image_cover || currentItem.cover || currentItem.image_poster || currentItem.poster || currentItem.thumbnail || currentItem.image || "https://fakeimg.pl/800x400/1B1B1B/909090");
+  // Prioritas Cover untuk Hero/Landscape, hilangkan poster agar tidak menggunakan gambar vertikal
+  const bgImage = fixImageUrl(currentItem.image_cover || currentItem.cover || currentItem.thumbnail || currentItem.image || "https://fakeimg.pl/800x400/1B1B1B/909090");
 
   const nextSlide = () => setCurrentIndex(prev => prev === slides.length - 1 ? 0 : prev + 1);
   const prevSlide = () => setCurrentIndex(prev => prev === 0 ? slides.length - 1 : prev - 1);
